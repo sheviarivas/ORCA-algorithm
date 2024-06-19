@@ -59,7 +59,7 @@ class ThetaStar : public PathPlanner {
 		std::unordered_map<int, Node> close;
 		std::vector<std::list<Node>> open;
 		int openSize;
-		bool glPathCreated;
+		bool glPathCreated;							// significa globalPathCreated
 		LineOfSight visChecker;
 
 

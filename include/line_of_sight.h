@@ -148,6 +148,7 @@ class LineOfSight {
 			return lineCells;
 		}
 		//returns all cells that are affected by agent during moving along a line
+		// devuelve todas las celdas que se ven afectadas por el agente durante el desplazamiento a lo largo de una línea
 
 		template<class T>
 		bool checkTraversability(int x, int y, const T &map) {
@@ -158,6 +159,7 @@ class LineOfSight {
 			return true;
 		}
 		//checks traversability of all cells affected by agent's body
+		// osea, chequea que la celda esté en el mapa y no sea un obstáculo
 
 		template<class T>
 		bool checkLine(int x1, int y1, int x2, int y2, const T &map) {

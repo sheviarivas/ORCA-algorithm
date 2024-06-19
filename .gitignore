@@ -3,5 +3,9 @@
 /cmake-build-debug
 /cmake-build-release
 /build
+/malitoBuild
 /.vscode
 README.html
+/paper_tasks
+/buildOld
+/malitoBuildOld

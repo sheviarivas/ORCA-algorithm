@@ -104,6 +104,7 @@ Mission::~Mission() {
 
 
 bool Mission::ReadTask() {
+	// se lee el .xml y se inicializan variables: map, allAgents, options
 	return taskReader->ReadData() && taskReader->GetMap(&map) && taskReader->GetAgents(agents, this->agentsNum) &&
 		   taskReader->GetEnvironmentOptions(&options);
 }
@@ -113,10 +114,11 @@ Summary Mission::StartMission() {
 #if FULL_OUTPUT
 	std::cout << "Start\n";
 #endif
-
+	// creo que se usa para calcular cuanto tiempo toma la ejecución
 	auto startpnt = std::chrono::high_resolution_clock::now();
 	for (auto agent: agents) {
 #if MAPF_LOG
+		//was is das???? cmo es pal PARandECBS asi que nnuuuuo
 		if (dynamic_cast<ORCAAgentWithPARAndECBS*>(agent) != nullptr) {
 			dynamic_cast<ORCAAgentWithPARAndECBS *>(agent)->SetMAPFInstanceLoggerRef(&MAPFLog);
 		}

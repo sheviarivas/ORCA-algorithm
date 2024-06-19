@@ -33,22 +33,22 @@ Agent::Agent(const int &id, const Point &start, const Point &goal, const Map &ma
 	this->goal = goal;
 	this->map = &map;
 	this->options = &options;
-	this->param = param;
+	this->param = param;													// ??
 
 	Neighbours = std::vector<std::pair<float, Agent *>>();
 	Neighbours.reserve((unsigned int) param.agentsMaxNum);
 	NeighboursObst = std::vector<std::pair<float, ObstacleSegment>>();
-	ORCALines = std::vector<Line>();
-	ORCALines.reserve((unsigned int) param.agentsMaxNum);
+	ORCALines = std::vector<Line>();										// ??
+	ORCALines.reserve((unsigned int) param.agentsMaxNum);					// ??
 	position = start;
 	prefV = Point();
 	newV = Point();
-	currV = Point();
-	invTimeBoundaryObst = 1 / param.timeBoundaryObst;
-	invTimeBoundary = 1 / param.timeBoundary;
-	collisions = 0;
-	collisionsObst = 0;
-	float maxObstDist = param.maxSpeed;
+	currV = Point();														// ??
+	invTimeBoundaryObst = 1 / param.timeBoundaryObst;						// ??
+	invTimeBoundary = 1 / param.timeBoundary;								// ??
+	collisions = 0;															// ??
+	collisionsObst = 0;														// ??
+	float maxObstDist = param.maxSpeed;										// ??
 	maxSqObstDist = maxObstDist * maxObstDist;
 	//maxSqObstDist = std::pow((param.sightRadius + param.radius), 2.0f);
 	// maxSqObstDist = std::pow((param.maxSpeed * param.timeBoundaryObst + param.radius), 2.0f);
@@ -102,18 +102,18 @@ bool Agent::isFinished() {
 	return ((this->position - this->goal).EuclideanNorm() < options->delta);
 }
 
-
+// sobreescribe el significado del operador ==
 bool Agent::operator==(const Agent &another) const {
 	return this->id == another.id;
 }
 
-
+// sobreescribe el significado del operador !=
 bool Agent::operator!=(const Agent &another) const {
 	return this->id != another.id;
 }
 
 
-void Agent::AddNeighbour(Agent &neighbour, float distSq) {
+void Agent::AddNeighbour(Agent &neighbour, float distSq) {	// distSq ?? dist Square??
 	float sightSq = param.sightRadius * param.sightRadius;
 
 	if (distSq >= sightSq) {
@@ -173,6 +173,7 @@ std::pair<unsigned int, unsigned int> Agent::GetCollision() const {
 
 
 bool Agent::InitPath() {
+	// planner puede ser de la clase DirectPlanner o ThetaStar
 	return planner->CreateGlobalPath();
 }
 

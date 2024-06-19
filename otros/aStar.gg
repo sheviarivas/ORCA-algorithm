@@ -1,0 +1,42 @@
+from queue import PriorityQueue
+
+def computeShortestPath(s_start, s_goal):
+    g_cost = {}  # Costo real acumulado desde el inicio
+    g_cost[s_start] = 0
+    parent = {}  # Padres de los nodos
+    parent[s_start] = s_start
+    openlist = PriorityQueue()  # Lista abierta como una cola de prioridad
+    openlist.put((g_cost[s_start] + h_cost[s_start], s_start))  # Agregar nodo inicial a la lista abierta
+    closedlist = set()  # Lista cerrada como un conjunto
+    
+    while not openlist.empty():  # Mientras openlist no esté vacía
+        _, s = openlist.get()  # Extrae el nodo con el menor f_cost
+        if s == s_goal:
+            return "path found"
+        closedlist.add(s)  # Agrega el nodo actual a la lista cerrada
+        for s_prime in neighbor(s):
+            if s_prime not in closedlist:
+                if s_prime not in g_cost or g_cost[s] + cost(s, s_prime) < g_cost[s_prime]:
+                    g_cost[s_prime] = g_cost[s] + cost(s, s_prime)
+                    parent[s_prime] = s
+                    openlist.put((g_cost[s_prime] + h_cost[s_prime], s_prime))  # Agrega el nodo a la lista abierta
+    
+    return "no path found"
+
+def updateVertex(s, s_prime):
+    pass  # No se necesita esta función en la implementación corregida
+
+
+def extractPath(s_start, s_goal, parent):
+    path = [s_goal]  # Inicializa el camino con el nodo objetivos
+    current = s_goal
+    while current != s_start:
+        current = parent[current]  # Retrocede al nodo padre
+        path.append(current)  # Agrega el nodo padre al camino
+    path.reverse()  # Invierte el camino para que vaya desde el inicio hasta el objetivo
+    return path
+
+
+CreateGlobalPath
+SearchPath
+AddOpen     // creo que involucra tmb el sightOfLine

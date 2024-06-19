@@ -86,6 +86,10 @@ class Agent {
 
 		Agent &operator=(const Agent &obj);
 
+		// Las plantillas permiten escribir funciones o clases genéricas que pueden trabajar con cualquier tipo de datos.
+		// Esto quiere decir que la clase Planner no existe, y podría llamarse de cualquier manera.
+		// La idea detrás de esta función es setear un planner que puede provenir de distintas clases, pero que debe 
+		// heredar de la clase PathPlanner
 		template<class Planner>
 		void SetPlanner(const Planner &pl) {
 			static_assert(std::is_base_of<PathPlanner, Planner>::value, "Planner should be inheritor of PathPlanner");

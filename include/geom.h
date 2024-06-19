@@ -9,7 +9,7 @@
 #ifndef ORCA_GEOM_H
 #define ORCA_GEOM_H
 
-
+// se definen más abajo los métodos
 class Node {
 	public:
 		int i, j;

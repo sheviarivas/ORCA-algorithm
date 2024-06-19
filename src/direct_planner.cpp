@@ -7,6 +7,7 @@ bool DirectPlanner::GetNext(const Point &curr, Point &next) {
 }
 
 bool DirectPlanner::CreateGlobalPath() {
+	// siempre true, va directo a la meta (creo que no le importan los obstáculos)
 	return true;
 }
 

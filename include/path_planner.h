@@ -7,6 +7,9 @@
 #ifndef ORCA_PATHPLANNER_H
 #define ORCA_PATHPLANNER_H
 
+// no existe path_planner.cpp asociado al archivo? 
+// por lo que veo path_planner solo es heredado de direct_planner y thetastar
+// la clase agent hace uso de un planner
 
 class PathPlanner {
 	public:
@@ -45,7 +48,7 @@ class PathPlanner {
 
 	protected:
 		const Map *map;
-		const environment_options *options;
+		const environment_options *options;	// ??
 		Point glStart;
 		Point glGoal;
 		float radius;

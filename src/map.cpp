@@ -112,7 +112,7 @@ float Map::GetCellSize() const {
 
 Node Map::GetClosestNode(const Point &point) const {
 	Node res;
-	res.i = height - 1 - (int) (point.Y() / cellSize);
+	res.i = height - 1 - (int) (point.Y() / cellSize);	// but why though?
 	res.j = (int) (point.X() / cellSize);
 
 	if (res.i < 0) {

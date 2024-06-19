@@ -35,8 +35,12 @@ int main(int argc, char *argv[]) {
 
 
 	Mission task = Mission(taskfile, num, STEP_MAX, IS_TIME_BOUNDED, TIME_MAX, STOP_BY_SPEED);
+
+	// se lee el .xml y se inicializan variables
 	if (task.ReadTask()) {
+		
 		auto summary = task.StartMission();
+		
 		auto full_summary = summary.getFullSummary();
 		std::vector<std::string> keys, values;
 		for(auto it = full_summary.begin(); it != full_summary.end(); ++it) {

@@ -39,11 +39,11 @@ class Map {
 		Map &operator=(const Map &obj);
 
 	private:
-		float cellSize;
+		float cellSize;			// cómo influye este dato en la simulación... influye en el cálculo de coord de los nodos GetClosestNode
 		unsigned int height;
 		unsigned int width;
 		std::vector<std::vector<int>> *grid;
-		std::vector<std::vector<ObstacleSegment>> *obstacles;
+		std::vector<std::vector<ObstacleSegment>> *obstacles; // revisar la clase...
 
 };
 
