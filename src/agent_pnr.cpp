@@ -170,7 +170,7 @@ agent_pnr &agent_pnr::operator=(const agent_pnr &obj) {
 
 
 void agent_pnr::ComputeNewVelocity() {
-	if (PARExec) {
+	if (PARExec) {	// si se está ejecutando PAR (?) (PAR Exectution ?) // falta saber qué es PARExec
 		// Collision count
 		unsigned long minMaxNum = (param.agentsMaxNum < Neighbours.size()) ? param.agentsMaxNum : Neighbours.size();
 
@@ -224,10 +224,10 @@ void agent_pnr::ComputeNewVelocity() {
 	}
 
 
-	ORCALines.clear();
+	ORCALines.clear();	// para qué son las ORCALines ???
 
 
-	// Получение ORCA-линий препятсвий
+	// Получение ORCA-линий препятсвий	// (traducido) Obtaining ORCA obstacle lines
 	for (int i = 0; i < NeighboursObst.size(); i++) {
 		Line line;
 
@@ -428,7 +428,7 @@ void agent_pnr::ComputeNewVelocity() {
 
 	size_t numObstLines = ORCALines.size();
 
-	//Получение ORCA-линий агентов
+	//Получение ORCA-линий агентов	// (traducido) Obtaining ORCA lines of agents
 	//std::sort(Neighbours.begin(),Neighbours.end(), Compare);
 
 	Line currline;
@@ -436,15 +436,15 @@ void agent_pnr::ComputeNewVelocity() {
 	Vector u, w;
 
 	unsigned long minMaxNum = (param.agentsMaxNum < Neighbours.size()) ? param.agentsMaxNum : Neighbours.size();
-
-	for (unsigned long i = 0; i < minMaxNum; i++) {
+	
+	for (unsigned long i = 0; i < minMaxNum; i++) {	// Considera agentes vecinos
 		auto Neighbour = Neighbours[i];
 		curragent = dynamic_cast<agent_pnr *>(Neighbour.second);
 		auto circlecenter = curragent->position - this->position; //(P_b - P_a)
 		auto relvelocity = this->currV - curragent->currV; //(V_a - V_b)
 
 		float radiussum = fakeRadius + curragent->fakeRadius; //(R_a + R_b)
-		float radiussum2 = radiussum * radiussum;
+		float radiussum2 = radiussum * radiussum;	// but why though ???
 		float distSq = circlecenter.SquaredEuclideanNorm();
 		float trueSqRadSum = (param.radius + curragent->param.radius) * (param.radius + curragent->param.radius);
 
@@ -454,7 +454,7 @@ void agent_pnr::ComputeNewVelocity() {
 
 		if (distSq >= radiussum2) {
 			w = relvelocity - (circlecenter *
-							   invTimeBoundary); //w -- вектор на плоскости скоростей от центра малой окружности (основания VO) до скорости другого агента относительно этого
+							   invTimeBoundary); //w -- вектор на плоскости скоростей от центра малой окружности (основания VO) до скорости другого агента относительно этого	// (trad.) vector in the velocity plane from the center of the small circle (base VO) to the velocity of another agent relative to it
 			float sqwlength = w.SquaredEuclideanNorm();
 			float wproj = w.ScalarProduct(circlecenter);
 
@@ -521,8 +521,8 @@ void agent_pnr::ApplyNewVelocity() {
 	waitForStart = false;
 	waitForFinish = false;
 
-	speedSaveBuffer.pop_front();
-	if (inPARMode) {
+	speedSaveBuffer.pop_front();	// para qué es speedSaveBuffer??	// para calcular meanSavedSpeed	// falta saber cómo se inicializa	// se inicializa todo el vector como options->movespeed
+	if (inPARMode) {	// para qué es inPARMode??
 		if (PARExec) {
 			flowtimeCount++;
 		}
@@ -543,14 +543,15 @@ void agent_pnr::ApplyNewVelocity() {
 		c = (t - sum) - y;
 		sum = t;
 	}
-	meanSavedSpeed = sum / speedSaveBuffer.size();
+	meanSavedSpeed = sum / speedSaveBuffer.size();	// permite detectar si un agente activa MAPF ? // Asies, pero creo que para mi caso, no lo voy a necesitar
 }
 
 
 bool agent_pnr::UpdatePrefVelocity() {
 
 	Point next;
-	if (inPARMode) {
+	if (inPARMode) {	// falta saber qué es inPARMode
+		std::cout<<"uh1"<<std::endl;
 		if (PARUnion) {
 			UnitePAR();
 			prefV = Point();
@@ -559,6 +560,7 @@ bool agent_pnr::UpdatePrefVelocity() {
 		}
 
 		if (notPARVis) {
+			std::cout<<"uh2"<<std::endl;
 			UpdatePAR();
 			prefV = Point();
 			nextForLog = position;
@@ -566,6 +568,7 @@ bool agent_pnr::UpdatePrefVelocity() {
 		}
 
 		if (PARExec) {
+			std::cout<<"uh3"<<std::endl;
 			nextForLog = PARGoal;
 			bool allOnPos = true;
 			bool allFin = true;
@@ -669,29 +672,31 @@ bool agent_pnr::UpdatePrefVelocity() {
 		}
 	}
 	else {
-		if (PARVis) {
+		if (PARVis) {	// falta saber qué es PARVis
+			std::cout<<"uh4"<<std::endl;
 			prefV = Point();
 			return true;
 		}
-		if (planner->GetNext(position, next)) {
+		if (planner->GetNext(position, next)) {	// siguiente nodo al cual ir?. Asies. Se basa en la lista obtenida por Theta*
 			nextForLog = next;
 			Vector goalVector = next - position;
-			float dist = goalVector.EuclideanNorm();
-			if ((options->trigger == MAPFTriggers::COMMON_POINT && CommonPointMAPFTrigger(dist)) ||
+			float dist = goalVector.EuclideanNorm();	// largo o magniturd del vector
+			if ((options->trigger == MAPFTriggers::COMMON_POINT && CommonPointMAPFTrigger(dist)) ||				// falta forzar situaciones...
 				(options->trigger == MAPFTriggers::SPEED_BUFFER && SingleNeighbourMeanSpeedMAPFTrigger())) {
+				std::cout<<"uh5"<<std::endl;
 				PreparePARExecution();
 				prefV = Point();
 
 				return true;
 			}
 			else {
-				if (next == goal && dist < options->delta) {
-					prefV = Point();
+				if (next == goal && dist < options->delta) {	// si llegamos a la meta
+					prefV = Point();	// detener al ag. (stop)
 					return true;
 				}
 
-				if (dist > CN_EPS) {
-					goalVector = (goalVector / dist) * param.maxSpeed;
+				if (dist > CN_EPS) {	// si el ag no está tan tan tan cerca de la meta
+					goalVector = (goalVector / dist) * param.maxSpeed;	// se normaliza el vector y se multiplica por la vel max del ag
 				}
 
 				prefV = goalVector;
@@ -721,29 +726,29 @@ agent_pnr *agent_pnr::Clone() const {
 
 
 void agent_pnr::AddNeighbour(Agent &neighbour, float distSq) {
-	float sightSq = param.sightRadius * param.sightRadius;
+	float sightSq = param.sightRadius * param.sightRadius;	// sightRadius en xml
 
-	if (!(distSq < sightSq)) {
+	if (!(distSq < sightSq)) {	// si no estás tan cerca
 		return;
 	}
 
 	int i = 0;
 	auto tmpit = Neighbours.begin();
 
-	while (tmpit != Neighbours.end() && i < param.agentsMaxNum && Neighbours[i].first < distSq) {
+	while (tmpit != Neighbours.end() && i < param.agentsMaxNum && Neighbours[i].first < distSq) {	// 1. 2.agentsmaxnum: cant vecinos máximos 3. // vecinos con dist menores al vecino actual que entra
 		i++;
 		tmpit++;
 	}
 
-	if (i < param.agentsMaxNum) {
-		Neighbours.insert(tmpit, std::pair<float, Agent *>(distSq, &neighbour));
+	if (i < param.agentsMaxNum) {	// agentsmaxnum: cant vecinos máximos. Para evitar meterle más (?)
+		Neighbours.insert(tmpit, std::pair<float, Agent *>(distSq, &neighbour));	// están ordenados por distSq
 
-		auto tmpAgentPAR = dynamic_cast<agent_pnr *>(&neighbour);
-		if (tmpAgentPAR->inPARMode) {
-			PARVis = true;
+		auto tmpAgentPAR = dynamic_cast<agent_pnr *>(&neighbour);	// obtiene un puntero agent_pnr
+		if (tmpAgentPAR->inPARMode) {	// uh??? no conozco aún qué hace inPARMode
+			PARVis = true;	// uh??? no conozco aún qué hace PARVis
 
 			if (inPARMode) {
-				if (!tmpAgentPAR->PARUnion && PARAgents.find(tmpAgentPAR) == PARAgents.end()) {
+				if (!tmpAgentPAR->PARUnion && PARAgents.find(tmpAgentPAR) == PARAgents.end()) {	// aqui me perdi. En tus ojos o.o
 					if (distSq < (param.radius + tmpAgentPAR->param.radius + 0.25) *
 								 (param.radius + tmpAgentPAR->param.radius + 0.25)) {
 						PARUnion = true;
@@ -751,8 +756,8 @@ void agent_pnr::AddNeighbour(Agent &neighbour, float distSq) {
 				}
 			}
 		}
-		else if (inPARMode) {
-			notPARVis = true;
+		else if (inPARMode) {	// falta saber sobre inPARMode
+			notPARVis = true;	// falta saber sobre notPARVis
 		}
 	}
 }

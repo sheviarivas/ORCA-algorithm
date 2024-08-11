@@ -56,20 +56,20 @@ void Vertex::SetConvex(bool cvx) {
 
 using namespace Utils;
 
-float Utils::SqPointSegDistance(Point L1, Point L2, Point P) {
-	auto v = L2 - L1;
-	auto w = P - L1;
+float Utils::SqPointSegDistance(Point L1, Point L2, Point P) {	// cálculo de la distancia de un segmento a un punto
+	auto v = L2 - L1;	// vector del segmento
+	auto w = P - L1;	// vector del pto P al primer punto del segmento
 	float c1, c2;
-	if ((c1 = w.ScalarProduct(v)) <= 0.0f) {
-		return (P - L1).SquaredEuclideanNorm();
+	if ((c1 = w.ScalarProduct(v)) <= 0.0f) {	// producto punto w v (proyección escalar de w sobre v)
+		return (P - L1).SquaredEuclideanNorm();	// producto punto consigo mismo = norma del vector al cuadrado (se usa esto para no lidiar con raíces)
 	}
-	if ((c2 = v.ScalarProduct(v)) <= c1) {
-		return (P - L2).SquaredEuclideanNorm();
+	if ((c2 = v.ScalarProduct(v)) <= c1) {		// producto punto v v
+		return (P - L2).SquaredEuclideanNorm();	// producto punto consigo mismo
 	}
 
-	float b = c1 / c2;
-	Point Pb = L1 + v * b;
-	return (P - Pb).SquaredEuclideanNorm();
+	float b = c1 / c2;	// fracción que representa la relación entre la proyección de w sobre el vector v
+	Point Pb = L1 + v * b;	// Pb representa el punto perteneciente a la recta v donde cae la proyección de w sobre v
+	return (P - Pb).SquaredEuclideanNorm();	// producto punto entre la distancia del punto P y Pb
 }
 
 

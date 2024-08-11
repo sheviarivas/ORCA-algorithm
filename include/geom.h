@@ -131,7 +131,7 @@ class Vertex : public Point {
 
 class ObstacleSegment {
 	public:
-		ObstacleSegment() = default;
+		ObstacleSegment() = default;	// predeter. por el compilador
 
 		ObstacleSegment(const ObstacleSegment &obj) : left(obj.left), right(obj.right), id(obj.id), next(obj.next),
 													  prev(obj.prev), dir(obj.dir) {}

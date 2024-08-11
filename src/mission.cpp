@@ -113,6 +113,7 @@ bool Mission::ReadTask() {
 Summary Mission::StartMission() {
 #if FULL_OUTPUT
 	std::cout << "Start\n";
+	std::cout << "\n\n";
 #endif
 	// creo que se usa para calcular cuanto tiempo toma la ejecución
 	auto startpnt = std::chrono::high_resolution_clock::now();
@@ -123,9 +124,11 @@ Summary Mission::StartMission() {
 			dynamic_cast<ORCAAgentWithPARAndECBS *>(agent)->SetMAPFInstanceLoggerRef(&MAPFLog);
 		}
 #endif
+		std::cout<<"Nodos Theta Agente "<<agent->GetID()<<std::endl<<std::endl;	// marcado
 		bool found = agent->InitPath();
 #if FULL_OUTPUT
 		if (!found) {
+			
 			std::cout << agent->GetID() << " " << "Path not found\n";
 		}
 #endif
@@ -140,14 +143,14 @@ Summary Mission::StartMission() {
 	}
 	bool needToStop, needToStopByTime, needToStopBySteps, needToStopBySpeed;
 	do {
-		AssignNeighbours();
+		AssignNeighbours();	// actualiza vecinos (ag. y obs.) añadiendo nuevos o quitando aquellos que se alejaron en el camino
 
 		for (auto &agent: agents) {
-			agent->UpdatePrefVelocity();
+			agent->UpdatePrefVelocity();	// obtener dirección de vector hacia meta
 		}
 
 		for (auto &agent: agents) {
-			agent->ComputeNewVelocity();
+			agent->ComputeNewVelocity();	// considerará otros ag., obstáculos, y celdas disponibles contra la dirección obtenida (?) 
 		}
 
 		UpdateSate();
@@ -252,9 +255,9 @@ bool Mission::SaveLog() {
 void Mission::UpdateSate() {
 	size_t i = 0;
 	allStops = true;
-
+	// std::cout<< "Step "<< stepsCount<< std::endl;
 	for (auto &agent: agents) {
-		agent->ApplyNewVelocity();
+		agent->ApplyNewVelocity();	// actualiza currV y meanSavedSpeed. Otros parámetros quedan en false
 		Point newPos = agent->GetPosition() + (agent->GetVelocity() * options->timestep);
 		agent->SetPosition(newPos);
 		commonSpeedsBuffer[i].pop_front();
@@ -272,7 +275,7 @@ void Mission::UpdateSate() {
 		}
 		mean = sum / commonSpeedsBuffer[i].size();
 
-		if (mean >= MISSION_SMALL_SPEED) {
+		if (mean >= MISSION_SMALL_SPEED) {	// qué serás tú...	// quizá para detectar cuando los ag no se estén moviendo	// asies, y si queda true, se mata la simulación
 			allStops = false;
 		}
 
@@ -281,7 +284,9 @@ void Mission::UpdateSate() {
 		goalsLog[agent->GetID()].push_back(agent->GetNext());
 #endif
 		i++;
+		// std::cout<< "Posición Ag " << agent->GetID()<< ": " << agent->GetPosition().ToString()<< std::endl;
 	}
+	// std::cout<< std::endl;
 
 	stepsCount++;
 }
@@ -291,9 +296,9 @@ void Mission::AssignNeighbours() {
 	for (auto &agent: agents) {
 
 		for (auto &neighbour: agents) {
-			if (agent != neighbour) {
-				float distSq = (agent->GetPosition() - neighbour->GetPosition()).SquaredEuclideanNorm();
-				agent->AddNeighbour(*neighbour, distSq);
+			if (agent != neighbour) {	// si no soy yo mismo
+				float distSq = (agent->GetPosition() - neighbour->GetPosition()).SquaredEuclideanNorm(); // (xa - xb) pow itself, same with y
+				agent->AddNeighbour(*neighbour, distSq);	// evaluamos si se añade o no a partir de su distancia
 			}
 		}
 		agent->UpdateNeighbourObst();

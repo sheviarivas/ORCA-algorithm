@@ -48,9 +48,9 @@ class PathPlanner {
 
 	protected:
 		const Map *map;
-		const environment_options *options;	// ??
-		Point glStart;
-		Point glGoal;
+		const environment_options *options;	// ?? quizá las precargadas en el xml
+		Point glStart;	// inicio
+		Point glGoal;	// fin
 		float radius;
 
 };

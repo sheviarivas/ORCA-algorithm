@@ -130,8 +130,8 @@ class Agent {
 		unsigned int collisionsObst;
 
 		Point nextForLog;
-		std::list<float> speedSaveBuffer;
-		float meanSavedSpeed;
+		std::list<float> speedSaveBuffer;	// para calcular meanSavedSpeed
+		float meanSavedSpeed;	// usado en SingleNeighbourMeanSpeedMAPFTrigger
 
 
 };

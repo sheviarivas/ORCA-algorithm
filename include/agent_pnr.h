@@ -79,10 +79,10 @@ class agent_pnr : public Agent {
 		MAPFActorSet PARSet;
 		MAPFConfig conf;
 		std::set<agent_pnr *> PARAgents;
-		float fakeRadius;
-		bool inPARMode;
-		bool moveToPARPos;
-		bool PARVis;
+		float fakeRadius;	// uh???
+		bool inPARMode;	// uh???	// true al ejecutar PreparePARExecution()
+		bool moveToPARPos;		// true al ejecutar PreparePARExecution()
+		bool PARVis;	// uh???
 		bool notPARVis;
 		bool PARUnion;
 		bool PARExec;

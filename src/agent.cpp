@@ -113,10 +113,10 @@ bool Agent::operator!=(const Agent &another) const {
 }
 
 
-void Agent::AddNeighbour(Agent &neighbour, float distSq) {	// distSq ?? dist Square??
+void Agent::AddNeighbour(Agent &neighbour, float distSq) {	// distSq ?? dist Square?? Asies
 	float sightSq = param.sightRadius * param.sightRadius;
 
-	if (distSq >= sightSq) {
+	if (distSq >= sightSq) {	// si está más lejos de lo que puedo verlo
 		return;
 	}
 	int i = 0;
@@ -144,21 +144,21 @@ Point Agent::GetPosition() const {
 
 void Agent::UpdateNeighbourObst() {
 	NeighboursObst.clear();
-	std::vector<std::vector<ObstacleSegment>> tmpObstacles = map->GetObstacles();
+	std::vector<std::vector<ObstacleSegment>> tmpObstacles = map->GetObstacles();	// entender clase ObstacleSegment	// ver Map::Map
 	float distSq = 0;
 
-	for (int i = 0; i < tmpObstacles.size(); i++) {
-		for (int j = 0; j < tmpObstacles[i].size(); j++) {
+	for (int i = 0; i < tmpObstacles.size(); i++) {	// por cada obstáculo
+		for (int j = 0; j < tmpObstacles[i].size(); j++) {	// por cada pto del obstáculo
 
 			distSq = Utils::SqPointSegDistance(static_cast<Point>(tmpObstacles[i][j].left),
-											   static_cast<Point>(tmpObstacles[i][j].right), position);
-			if (distSq < maxSqObstDist) {
-				NeighboursObst.push_back({distSq, tmpObstacles[i][j]});
+											   static_cast<Point>(tmpObstacles[i][j].right), position);	// but why though??? se transforman los puntos de los obstáculos en líneas y se calcula la distancia de estas líneas con la pos actual del ag
+			if (distSq < maxSqObstDist) {	// se inicializa como maxSpeed * maxSpeed (?) revisar si queda con ese valor. Yes. En xml es movespeed
+				NeighboursObst.push_back({distSq, tmpObstacles[i][j]});	// se añade la línea de obstáculo
 			}
 		}
 	}
 
-	std::sort(NeighboursObst.begin(), NeighboursObst.end(), Utils::Less<ObstacleSegment>);
+	std::sort(NeighboursObst.begin(), NeighboursObst.end(), Utils::Less<ObstacleSegment>);	// ordena de menor a mayor los obstáculos sgn su distancia
 }
 
 
@@ -172,8 +172,7 @@ std::pair<unsigned int, unsigned int> Agent::GetCollision() const {
 }
 
 
-bool Agent::InitPath() {
-	// planner puede ser de la clase DirectPlanner o ThetaStar
+bool Agent::InitPath() {	// planner puede ser de la clase DirectPlanner o ThetaStar
 	return planner->CreateGlobalPath();
 }
 
@@ -227,7 +226,7 @@ Point Agent::GetNext() const {
 
 
 bool Agent::CommonPointMAPFTrigger(float distToTargetPoint) {
-	return (Neighbours.size() >= options->MAPFNum) && (distToTargetPoint < param.sightRadius);
+	return (Neighbours.size() >= options->MAPFNum) && (distToTargetPoint < param.sightRadius);	// qué pasa si mis agentes tan muy lejos de la meta y tan en deadlock?
 }
 
 
@@ -247,7 +246,7 @@ bool Agent::CommonPointMAPFTrigger(float distToTargetPoint) {
 //}
 
 
-bool Agent::NeighbourGroupMeanSpeedMAPFTrigger() {
+bool Agent::NeighbourGroupMeanSpeedMAPFTrigger() {	// no se usa?
 	size_t nNum = (options->MAPFNum > Neighbours.size()) ? Neighbours.size() : options->MAPFNum;
 	if (!nNum) return false;
 

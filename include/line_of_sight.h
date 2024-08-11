@@ -151,7 +151,7 @@ class LineOfSight {
 		// devuelve todas las celdas que se ven afectadas por el agente durante el desplazamiento a lo largo de una línea
 
 		template<class T>
-		bool checkTraversability(int x, int y, const T &map) {
+		bool checkTraversability(int x, int y, const T &map) {	// chequea que todas las cells del ag. sean válidas (dentro del mapa y que no topen con obstáculos)
 			for (int k = 0; k < cells.size(); k++)
 				if (!map.CellOnGrid(x + cells[k].first, y + cells[k].second) ||
 					map.CellIsObstacle(x + cells[k].first, y + cells[k].second))
@@ -162,7 +162,7 @@ class LineOfSight {
 		// osea, chequea que la celda esté en el mapa y no sea un obstáculo
 
 		template<class T>
-		bool checkLine(int x1, int y1, int x2, int y2, const T &map) {
+		bool checkLine(int x1, int y1, int x2, int y2, const T &map) {	// algoritmo de Bresenham
 			//std::cout<<x1<<" "<<y1<<" "<<x2<<" "<<y2<<" "<<"\n";
 			if (!checkTraversability(x1, y1, map) ||
 				!checkTraversability(x2, y2, map)) //additional cheсk of start and goal traversability,

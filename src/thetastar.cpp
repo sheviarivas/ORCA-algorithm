@@ -30,40 +30,40 @@ ThetaStar::~ThetaStar() {}
 
 bool ThetaStar::GetNext(const Point &curr, Point &next) {
 	if (glPathCreated) {
-		if (currPath.size() == 0) {
+		if (currPath.size() == 0) {	// quizá el caso en que inicialicé el ag en su propia meta, debo probarlo... // o quizá cuando ya llega a la meta, pero para que se quede ahí
 			currPath.push_back(glGoal);
 		}
 
-		if (currPath.size() > 1) {
-			float sqDistToCurr = (currPath.front() - curr).SquaredEuclideanNorm();
+		if (currPath.size() > 1) {	// revisar!!	// currPath posee las celdas a las que el ag debe ir, sin considerar su pos actual
+			float sqDistToCurr = (currPath.front() - curr).SquaredEuclideanNorm();	// xa*xb + ya*yb
 			float sqDelta = options->delta * options->delta; // TODO Separate option
-			if (sqDistToCurr < sqDelta) {
+			if (sqDistToCurr < sqDelta) {	// if dentro de una meta local
 
 				if (!(currPath.front() == this->glGoal)) {
-					past = currPath.front();
+					past = currPath.front();	// quizá past es una variable para dsp?? // punto previo
 				}
 				currPath.pop_front();
 				next = currPath.front();
 				return true;
 			}
 		}
+		// fuera de una meta local (no la alcanzo por distancia delta establecida)
+		Node currNode = map->GetClosestNode(curr);	// obtener centro del nodo actual
 
-		Node currNode = map->GetClosestNode(curr);
-
-		Node nextNode = map->GetClosestNode(currPath.front());
-		if (std::next(currPath.begin()) != currPath.end()) {
+		Node nextNode = map->GetClosestNode(currPath.front());	// siguiente nodo en el path
+		if (std::next(currPath.begin()) != currPath.end()) {	// verdadero si size!=1	// But why though? // Cuando size == 1 quiere decir que solo le queda llegar a la meta final
 			Node nextNextNode = map->GetClosestNode(*std::next(currPath.begin()));
-			if (currNode == nextNode || visChecker.checkLine(currNode.i, currNode.j, nextNode.i, nextNode.j, *map)) {
+			if (currNode == nextNode || visChecker.checkLine(currNode.i, currNode.j, nextNode.i, nextNode.j, *map)) {	// 1.por si no tengo que llegar a mi meta actual, llegué a la sig. a esa 2. similar a 1. puedo llegar a la sig. meta desde dd toi
 				next = currPath.front();
 				if (currNode == nextNextNode ||
-					visChecker.checkLine(currNode.i, currNode.j, nextNextNode.i, nextNextNode.j, *map)) {
-					currPath.pop_front();
+					visChecker.checkLine(currNode.i, currNode.j, nextNextNode.i, nextNextNode.j, *map)) {	// 1. igual que el anterior. 2. compara con la versión node de next
+					currPath.pop_front();	// cambia el next por el siguiente. Quiere decir que alcancé la meta actual? a pesar de no cumplir con la distancia anterior?
 					next = currPath.front();
 				}
 				return true;
 			}
 		}
-		else {
+		else {	// verdadero con 0 o 1 elementos (no muy seguro del 0), aunque se hacen cargo del caso size == 0 antes, más arriba, so idk. // Este es el caso cuando solo queda la meta final
 			if (currNode == nextNode || visChecker.checkLine(currNode.i, currNode.j, nextNode.i, nextNode.j, *map)) {
 				next = currPath.front();
 				return true;
@@ -78,8 +78,8 @@ bool ThetaStar::GetNext(const Point &curr, Point &next) {
 //            return true;
 //        }
 
-		Point last = currPath.front();
-		currPath.pop_front();
+		Point last = currPath.front();	// no se usa
+		currPath.pop_front();			// no se usa
 
 //        bool isLastAccessible = SearchPath(map->GetClosestNode(curr), map->GetClosestNode(last));
 //        if(isLastAccessible)
@@ -87,7 +87,7 @@ bool ThetaStar::GetNext(const Point &curr, Point &next) {
 //            next = currPath.front();
 //            return true;
 //        }
-		currPath.clear();
+		currPath.clear();	// se recalcula todo otra vez?	quiero corroborarlo con un ejemplo
 		bool isGoalAccessible = SearchPath(map->GetClosestNode(curr), map->GetClosestNode(glGoal));
 		if (isGoalAccessible) {
 			next = currPath.front();
@@ -144,7 +144,7 @@ bool ThetaStar::SearchPath(const Node &start, const Node &goal) {
 		while (it != successors.end()) {
 			it->parent = parent;
 			it->H = ComputeHFromCellToCell(it->i, it->j, goal.i, goal.j);	// calcular heurística
-			*it = ResetParent(*it, *it->parent);	// chequea line of sight. Con qué lo reemplazas...? o a qué reemplazas...? A lo mjr cambias los vecinos de un nodo por los vecinos de su padre
+			*it = ResetParent(*it, *it->parent);	// chequea line of sight.
 			it->F = it->g + options->hweight * it->H;
 			AddOpen(*it);
 			it++;
@@ -279,15 +279,17 @@ float ThetaStar::Distance(int i1, int j1, int i2, int j2) const {
 
 
 void ThetaStar::MakePrimaryPath(Node curNode) {
-
-
+	std::cout<< "MakePrimaryPath"<<std::endl;
 	Node current = curNode;
 	while (current.parent) {
+		std::cout<<map->GetPoint(current).ToString();
+		std::cout<<"\n";	
 		currPath.push_front(map->GetPoint(current));
 		current = *current.parent;
 	}
-	// std::cout<<map->GetPoint(current).ToString();	// código comentado
+	std::cout<<map->GetPoint(current).ToString();	// comentado originalmente
 	// std::cout<<map->GetPoint(current).ToString();
+	std::cout<<"\n";	
 	std::cout<<"\n";	
 }
 

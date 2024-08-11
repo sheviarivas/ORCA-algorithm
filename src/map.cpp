@@ -112,7 +112,7 @@ float Map::GetCellSize() const {
 
 Node Map::GetClosestNode(const Point &point) const {
 	Node res;
-	res.i = height - 1 - (int) (point.Y() / cellSize);	// but why though?
+	res.i = height - 1 - (int) (point.Y() / cellSize);	// but why though?	// quizá para tratar la coord 'y' positiva hacia el norte
 	res.j = (int) (point.X() / cellSize);
 
 	if (res.i < 0) {
@@ -133,7 +133,7 @@ Node Map::GetClosestNode(const Point &point) const {
 
 
 Point Map::GetPoint(const Node &node) const {
-	return {(node.j * cellSize + cellSize / 2), (height - 1 - node.i) * cellSize + cellSize / 2};
+	return {(node.j * cellSize + cellSize / 2), (height - 1 - node.i) * cellSize + cellSize / 2};	// obtiene el centro de la celda
 }
 
 const std::vector<std::vector<ObstacleSegment>> &Map::GetObstacles() const {

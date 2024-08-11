@@ -227,7 +227,7 @@ bool XMLReader::ReadMap() {
 	for (mapnode = mapTag->FirstChildElement(); mapnode; mapnode = mapnode->NextSiblingElement()) {
 		element = mapnode->ToElement();
 		value = mapnode->Value();
-		std::transform(value.begin(), value.end(), value.begin(), ::tolower);
+		std::transform(value.begin(), value.end(), value.begin(), ::tolower);	// transforma a minúsculas
 
 		stream.str("");
 		stream.clear();
