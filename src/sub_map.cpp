@@ -150,7 +150,7 @@ int SubMap::GetEmptyCellCount() const {
 
 
 Node SubMap::FindUnoccupiedNode(Node start, std::unordered_map<int, Node> occupied) {
-	if (occupied.find(start.i * GetWidth() + start.j) == occupied.end() && CellIsTraversable(start.i, start.j)) {
+	if (occupied.find(start.i * GetWidth() + start.j) == occupied.end() && CellIsTraversable(start.i, start.j)) {	// si start está disponible y no es obstáculo
 		return start;
 	}
 	std::list<Node> open = std::list<Node>();
@@ -165,7 +165,7 @@ Node SubMap::FindUnoccupiedNode(Node start, std::unordered_map<int, Node> occupi
 		close.insert({curr.i * GetWidth() + curr.j, curr});
 		open.pop_front();
 
-		if (CellIsTraversable(curr.i, curr.j) && occupied.find(curr.i * GetWidth() + curr.j) == occupied.end()) {
+		if (CellIsTraversable(curr.i, curr.j) && occupied.find(curr.i * GetWidth() + curr.j) == occupied.end()) {	// retorna algún nodo válido de open
 			return curr;
 		}
 
@@ -194,7 +194,7 @@ Node SubMap::FindAccessibleNodeForGoal(Node start, Point goal, std::unordered_ma
 									   std::unordered_map<int, Node> undesirable) {
 	std::list<Node> open = std::list<Node>();
 	std::unordered_map<int, Node> close = std::unordered_map<int, Node>();
-	auto popMin = [&open]() -> Node {
+	auto popMin = [&open]() -> Node {	// Encuentra y elimina el nodo con el menor costo g de la lista open.
 		auto bestIt = open.begin();
 		for (auto node = open.begin(); node != open.end(); node++) {
 			if (node->g < bestIt->g) {
@@ -206,7 +206,7 @@ Node SubMap::FindAccessibleNodeForGoal(Node start, Point goal, std::unordered_ma
 		return best;
 	};
 
-	auto addNode = [&open](Node item) {
+	auto addNode = [&open](Node item) {	// Añade un nodo a la lista open, actualizándolo si ya existe y tiene un costo menor.
 		for (auto node = open.begin(); node != open.end(); node++) {
 			if (*node == item) {
 				if (node->g > item.g) {
@@ -224,10 +224,10 @@ Node SubMap::FindAccessibleNodeForGoal(Node start, Point goal, std::unordered_ma
 	Node currNode;
 
 	if (occupied.find(start.i * GetWidth() + start.j) != occupied.end() ||
-		undesirable.find(start.i * GetWidth() + start.j) != undesirable.end()) {
+		undesirable.find(start.i * GetWidth() + start.j) != undesirable.end()) {	// por qué multiplica por getWidth???	// igual que antes, con esto genera un ID único para cada celda	// si se encuentra en uno de estos dos vectores...
 		auto tmpOcupied = occupied;
 		tmpOcupied.insert(undesirable.begin(), undesirable.end());
-		currNode = FindUnoccupiedNode(start, tmpOcupied);
+		currNode = FindUnoccupiedNode(start, tmpOcupied);	// busca un nodo no ocupado cercano
 		if (currNode.i < 0) {
 			return currNode;
 		}
@@ -251,11 +251,11 @@ Node SubMap::FindAccessibleNodeForGoal(Node start, Point goal, std::unordered_ma
 		close.insert({currNode.i * GetWidth() + currNode.j, currNode});
 
 		if ((currNode.F < bestNode.F || (abs(currNode.F - bestNode.F) < CN_EPS && currNode.H < bestNode.H)) &&
-			undesirable.find(currNode.i * GetWidth() + currNode.j) == undesirable.end()) {
+			undesirable.find(currNode.i * GetWidth() + currNode.j) == undesirable.end()) {	// si currNode es mejor F (o H) y no está en undesirable
 			bestNode = currNode;
 		}
 
-		if (currNode.H < CN_EPS && undesirable.find(currNode.i * GetWidth() + currNode.j) == undesirable.end()) {
+		if (currNode.H < CN_EPS && undesirable.find(currNode.i * GetWidth() + currNode.j) == undesirable.end()) {	// si H es muy pequeño y no está en undesirable
 			currNode.parent = nullptr;
 			currNode.F = 0.0;
 			currNode.H = 0.0;
@@ -304,22 +304,22 @@ Node SubMap::FindCloseToPointAvailableNode(Point pos, std::unordered_map<int, No
 	auto start = this->GetClosestNode(pos);
 
 
-	if (occupied.find(start.i * GetWidth() + start.j) == occupied.end() && CellIsTraversable(start.i, start.j)) {
+	if (occupied.find(start.i * GetWidth() + start.j) == occupied.end() && CellIsTraversable(start.i, start.j)) {	// si nadie ha reclamado start
 		return start;
 	}
 
-	start.H = (this->GetPoint(start) - pos).EuclideanNorm();
+	start.H = (this->GetPoint(start) - pos).EuclideanNorm();	// celda restado posición
 
 	auto cmp = [](Node left, Node right) { return (left.H > right.H); };
 
-	std::priority_queue<Node, std::vector<Node>, decltype(cmp)> open(cmp);
+	std::priority_queue<Node, std::vector<Node>, decltype(cmp)> open(cmp);	// menor H, mayor prioridad
 
-	std::unordered_map<int, Node> openDupl = std::unordered_map<int, Node>();
+	std::unordered_map<int, Node> openDupl = std::unordered_map<int, Node>();	// mapa usado para buscar 
 
 	std::unordered_map<int, Node> close = std::unordered_map<int, Node>();
 
 	open.push(start);
-	openDupl.insert({start.i * GetWidth() + start.j, start});
+	openDupl.insert({start.i * GetWidth() + start.j, start});	// tiene el id del nodo		// se usa ancho del submapa
 
 	while (!open.empty()) {
 		Node curr = open.top();

@@ -63,7 +63,7 @@ void ConflictAvoidanceTable::removeAgentPath(const std::list<Node>::const_iterat
 int ConflictAvoidanceTable::getAgentsCount(const Node &node) const {
 	int res = 0;
 	auto tuple = std::make_tuple(node.i, node.j, node.g);
-	if (nodeAgentsCount.find(tuple) != nodeAgentsCount.end()) {
+	if (nodeAgentsCount.find(tuple) != nodeAgentsCount.end()) {	// nodeAgentsCount relacionado a addNode -> addAgentPath
 		res = nodeAgentsCount.at(tuple);
 	}
 	return res;

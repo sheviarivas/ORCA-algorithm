@@ -44,7 +44,7 @@ struct Constraint {
 	bool operator<(const Constraint &other) const {
 		return std::tuple<int, int, int, int, int, bool>(i, j, prev_i, prev_j, time, goalNode) <
 			   std::tuple<int, int, int, int, int, bool>(other.i, other.j, other.prev_i, other.prev_j, other.time,
-														 other.goalNode);
+														 other.goalNode);											// por qué compararlos así
 	}
 };
 
@@ -87,9 +87,9 @@ class ConstraintsSet {
 		bool hasEdgeConstraint(int i, int j, int time, int agentId, int prevI, int prevJ) const;
 
 //private:
-		std::set<Constraint> nodeConstraints;
-		std::set<Constraint> edgeConstraints;
-		std::set<Constraint> goalNodeConstraints;
+		std::set<Constraint> nodeConstraints;		// se actualizan cuando llaman addAgentPath
+		std::set<Constraint> edgeConstraints;		// se actualizan cuando llaman addAgentPath
+		std::set<Constraint> goalNodeConstraints;	// se actualizan cuando llaman addAgentPath
 		std::vector<Constraint> positiveConstraints;
 };
 

@@ -622,39 +622,39 @@ PushAndRotate::combineNodeSubgraphs(MAPFActorSet &agentSet, std::vector<std::uno
 }
 
 void PushAndRotate::getSubgraphs(const SubMap &map, MAPFActorSet &agentSet) {
-	std::unordered_set<Node, NodeHash> close;
+	std::unordered_set<Node, NodeHash> close;	// nodos explorados
 	std::vector<std::unordered_set<Node, NodeHash>> components;
-	std::unordered_set<Node, NodeHash> joinNodes;
-	int connectedComponentNum = 0;
+	std::unordered_set<Node, NodeHash> joinNodes;	// join vertices
+	int connectedComponentNum = 0;	// contador para los subgrafos identificados
 	for (int i = 0; i < map.GetHeight(); ++i) {
-		for (int j = 0; j < map.GetWidth(); ++j) {
+		for (int j = 0; j < map.GetWidth(); ++j) {	// vemos todo i,j del submapa
 			if (!map.CellIsObstacle(i, j)) {
 				Node curNode = Node(i, j);
-				if (close.find(curNode) == close.end()) {
-					int oldSize = close.size();
-					std::vector<std::pair<Node, Node>> edgeStack;
-					std::unordered_map<Node, int, NodeHash> in, up;
-					std::vector<std::tuple<Node, int, int>> stack = {std::make_tuple(curNode, -1, 0)};
+				if (close.find(curNode) == close.end()) {		// si no lo pillo en close buscamos su componente conectado
+					int oldSize = close.size();		// <> cuantos nodos han sido explorados hasta el momento 
+					std::vector<std::pair<Node, Node>> edgeStack;	// <> Pila que almacena las aristas encontradas durante la exploración.	// <> Almacena aristas del componente actual.
+					std::unordered_map<Node, int, NodeHash> in, up;	// <> Almacenan tiempos de entrada (in) y valores mínimos alcanzables (up) de los nodos para la detección de puentes y puntos de articulación.	// <> mantienen la profundidad y el valor mínimo de conexión de los nodos.
+					std::vector<std::tuple<Node, int, int>> stack = {std::make_tuple(curNode, -1, 0)};	// <> pila que simula un algoritmo de búsqueda como DFS. Se inicia con el curNode como el primer elemento
 
 					while (!stack.empty()) {
 						std::tuple<Node, int, int> state = stack.back();
-						Node cur = std::get<0>(state);
-						int lastInd = std::get<1>(state);
-						int depth = std::get<2>(state);
+						Node cur = std::get<0>(state);		// nodo actual
+						int lastInd = std::get<1>(state);	// <> índice del último sucesor explorado de un nodo en la pila stack
+						int depth = std::get<2>(state);		// profundidad
 
-						std::list<Node> successors = search->findSuccessors(cur, map);
+						std::list<Node> successors = search->findSuccessors(cur, map);	// search aquí es Astar		// sucesores que estén en el mapa y que no tengan problemas con restricciones
 						std::list<Node>::iterator it = successors.begin();
-						for (int i = 0; i < lastInd; ++i, ++it) {}
-						if (lastInd == -1) {
+						for (int i = 0; i < lastInd; ++i, ++it) {}	// mueve it lasInd veces
+						if (lastInd == -1) {	// <> cur se visita por primera vez (no se han procesado vecinos)
 							close.insert(cur);
 							agentSet.setConnectedComponent(cur.i, cur.j, connectedComponentNum);
 							in[cur] = depth;
 							up[cur] = depth;
 						}
 						else {
-							if ((depth != 0 && up[*it] >= in[cur]) || depth == 0) {
+							if ((depth != 0 && up[*it] >= in[cur]) || depth == 0) {		// <> Se detectan puentes si up[*it] >= in[cur]
 								std::pair<Node, Node> curEdge = std::make_pair(cur, *it);
-								getComponent(agentSet, curEdge, edgeStack, components);
+								getComponent(agentSet, curEdge, edgeStack, components);		// ojito se podría hacer insert a la vez
 								if (depth != 0) {
 									joinNodes.insert(cur);
 								}
@@ -663,18 +663,18 @@ void PushAndRotate::getSubgraphs(const SubMap &map, MAPFActorSet &agentSet) {
 							it = std::next(it);
 						}
 						for (it, lastInd = lastInd + 1; it != successors.end(); ++it, ++lastInd) {
-							if (close.find(*it) != close.end()) {
-								up[cur] = std::min(in[*it], up[cur]);
+							if (close.find(*it) != close.end()) {		// si pillé un vecino visitado
+								up[cur] = std::min(in[*it], up[cur]);	// actualizamos up
 							}
 							else {
-								std::pair<Node, Node> curEdge = std::make_pair(cur, *it);
+								std::pair<Node, Node> curEdge = std::make_pair(cur, *it);	// <> se crea arista
 								edgeStack.push_back(curEdge);
-								std::get<1>(stack.back()) = lastInd;
-								stack.push_back(std::make_tuple(*it, -1, depth + 1));
+								std::get<1>(stack.back()) = lastInd;	// actualiza lastInd
+								stack.push_back(std::make_tuple(*it, -1, depth + 1));	// añadimos al stack
 								break;
 							}
 						}
-						if (it == successors.end()) {
+						if (it == successors.end()) {	// si solo pillo vecinos visitados y ninguno nuevo
 							stack.pop_back();
 						}
 					}
@@ -757,13 +757,13 @@ void PushAndRotate::assignToSubgraphs(const SubMap &map, MAPFActorSet &agentSet)
 	std::vector<int> agentsInConnectedComponents(agentSet.getConnectedComponentsCount());
 	for (int i = 0; i < agentSet.getActorCount(); ++i) {
 		MAPFActor agent = agentSet.getActor(i);
-		++agentsInConnectedComponents[agentSet.getConnectedComponent(agent.getCur_i(), agent.getCur_j())];
+		++agentsInConnectedComponents[agentSet.getConnectedComponent(agent.getCur_i(), agent.getCur_j())];	// cuenta cuantos ag hay por cada componente conectado?
 	}
 
 	int m = map.GetEmptyCellCount() - agentSet.getActorCount();
 	for (int i = 0; i < map.GetHeight(); ++i) {
 		for (int j = 0; j < map.GetWidth(); ++j) {
-			if (map.CellIsObstacle(i, j)) {
+			if (map.CellIsObstacle(i, j)) {		// si no es transitable
 				continue;
 			}
 			Node pos(i, j);
@@ -772,9 +772,9 @@ void PushAndRotate::assignToSubgraphs(const SubMap &map, MAPFActorSet &agentSet)
 				continue;
 			}
 			int subgraph = subgraphs[0];
-			auto successors = search->findSuccessors(pos, map);
-			int totalCount = agentSet.getComponentSize(pos.i, pos.j) -
-							 agentsInConnectedComponents[agentSet.getConnectedComponent(pos.i, pos.j)];
+			auto successors = search->findSuccessors(pos, map);			// no entiendo como funniona...
+			int totalCount = agentSet.getComponentSize(pos.i, pos.j) -	
+							 agentsInConnectedComponents[agentSet.getConnectedComponent(pos.i, pos.j)];		// no entiendo como funciona...	// tamaño del componente conectado actual menos los agentes asignados a este componente.
 			int throughPos = 0;
 			bool hasSuccessorsInOtherSubgraph = false;
 			for (auto neigh: successors) {

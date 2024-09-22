@@ -569,7 +569,7 @@ bool agent_pnr::UpdatePrefVelocity() {
 
 		if (PARExec) {
 			std::cout<<"uh3"<<std::endl;
-			nextForLog = PARGoal;
+			nextForLog = PARGoal;	// PARGoal?
 			bool allOnPos = true;
 			bool allFin = true;
 
@@ -583,18 +583,18 @@ bool agent_pnr::UpdatePrefVelocity() {
 						(*(PARres.agentsPaths))[agPARId].size() - 1);
 				Point agCurrGoal = PARMap.GetPoint((*(PARres.agentsPaths))[agPARId][agPARPos]);
 
-				if (!((ag->position - agCurrGoal).EuclideanNorm() < options->delta) || !ag->PARExec) {
+				if (!((ag->position - agCurrGoal).EuclideanNorm() < options->delta) || !ag->PARExec) {		// si no estoy en mi pos inicial?
 					allOnPos = false;
 				}
 
-				if (!((ag->position - ag->PARGoal).EuclideanNorm() < options->delta) && ag->inPARMode) {
+				if (!((ag->position - ag->PARGoal).EuclideanNorm() < options->delta) && ag->inPARMode) {	// si no ha llegado a la meta actual
 					allFin = false;
 				}
 			}
 
-			if (allFin) {
+			if (allFin) {	// si llegaron todos los PARAgents a sus metas
 //                std::cout<<"Fin\n";
-				waitForFinish = true;
+				waitForFinish = true;	// única instancia en la que cambia...
 				inPARMode = false;
 				PARExec = false;
 				moveToPARPos = false;
@@ -681,9 +681,10 @@ bool agent_pnr::UpdatePrefVelocity() {
 			nextForLog = next;
 			Vector goalVector = next - position;
 			float dist = goalVector.EuclideanNorm();	// largo o magniturd del vector
-			if ((options->trigger == MAPFTriggers::COMMON_POINT && CommonPointMAPFTrigger(dist)) ||				// falta forzar situaciones...
+			if ((options->trigger == MAPFTriggers::COMMON_POINT && CommonPointMAPFTrigger(dist)) ||				// falta forzar situaciones... listo: 004
 				(options->trigger == MAPFTriggers::SPEED_BUFFER && SingleNeighbourMeanSpeedMAPFTrigger())) {
 				std::cout<<"uh5"<<std::endl;
+				std::cout<<this->GetID()<< "\t" <<this->GetPosition().ToString()<<endl;
 				PreparePARExecution();
 				prefV = Point();
 
@@ -786,7 +787,7 @@ void agent_pnr::PreparePARExecution() {
 	PARAgents.insert(this);
 	for (auto &el: Neighbours) {
 		agent_pnr *neighbour = dynamic_cast<agent_pnr *>(el.second);
-		if (!neighbour->inPARMode && !neighbour->waitForFinish) {
+		if (!neighbour->inPARMode && !neighbour->waitForFinish) {	// entender condicional
 			PARAgents.insert(neighbour);
 			neighbour->inPARMode = true;
 			neighbour->moveToPARPos = true;
@@ -808,9 +809,9 @@ void agent_pnr::PreparePARExecution() {
 
 	for (auto &ag: PARAgents) {
 		if (ag != this) {
-			ag->SetAgentsForCentralizedPlanning(PARAgents);
+			ag->SetAgentsForCentralizedPlanning(PARAgents);		// why	// mantener mismas ref de PARAgents en todos los actores involucrados
 		}
-		if (!ag->ComputePAREnv()) {
+		if (!ag->ComputePAREnv()) {		// se obtienen pos iniciales y finales para PAR
 			for (auto &ag1: PARAgents) {
 				while (!ag1->buffPar.empty()) {
 					ag1->planner->AddPointToPath(ag1->buffPar.back());
@@ -1077,7 +1078,7 @@ bool agent_pnr::ComputePAREnv() {
 	float minX = static_cast<float>(map->GetWidth() * map->GetCellSize()), minY = static_cast<float>(map->GetHeight() *
 																									 map->GetCellSize()), maxX = 0.0f, maxY = 0.0f;
 
-	for (auto &ag: PARAgents) {
+	for (auto &ag: PARAgents) {		// desconozco si se refiere a TODOS los ag que estén en PAR, o solo los del subconjunto actual		// solo los ag de este subconjunto
 		if ((ag->GetPosition().X() - ag->param.sightRadius) < minX) {
 			minX = (ag->GetPosition().X() - ag->param.sightRadius);
 		}
@@ -1098,19 +1099,21 @@ bool agent_pnr::ComputePAREnv() {
 	int width = nodeRightBottom.j - nodeLeftTop.j + 1;
 	int height = nodeRightBottom.i - nodeLeftTop.i + 1;
 	PARMap = SubMap(map, nodeLeftTop, {height, width}, 1);
+	std::cout<< "Submap: " << std::endl;
+	std::cout<< "(" << (int)minX << "," << (int)maxY << ")" << "\t" << height << "\t" << width << "\t" << std::endl;
 
 	// Starts and goals
 	std::unordered_map<int, Node> starts;
 	std::unordered_map<int, Node> goals;
-	std::unordered_map<int, Node> finalGoals;
+	std::unordered_map<int, Node> finalGoals;	
 
-	PARSet = MAPFActorSet();
+	PARSet = MAPFActorSet();	// se utiliza como parámetro en PAR
 	PARSet.clear();
 	Point tmpGoalPoint;
 	for (auto &ag: PARAgents) {
 		Node tmpStart, tmpGoal;
 
-		if (ag->PARStart.X() < 0) {
+		if (ag->PARStart.X() < 0) {		// si no está inicializado
 			tmpStart = PARMap.FindCloseToPointAvailableNode(ag->GetPosition(), starts);
 
 			if (tmpStart.i < 0) {
@@ -1128,13 +1131,13 @@ bool agent_pnr::ComputePAREnv() {
 				}
 				return false;
 			}
-			ag->PARStart = PARMap.GetPoint(tmpStart);
+			ag->PARStart = PARMap.GetPoint(tmpStart);	// asigna pos inicial para PAR
 		}
 		else {
-			tmpStart = PARMap.GetClosestNode(ag->PARStart);
+			tmpStart = PARMap.GetClosestNode(ag->PARStart);	// obtenemos nodo de la pos inicial
 		}
 
-		if (ag->PARGoal.X() < 0) {
+		if (ag->PARGoal.X() < 0) {		// si no está inicializado...
 			ag->buffPar.clear();
 			tmpGoalPoint = ag->GetGoalPointForMAPF(PARMap);
 			tmpGoal = PARMap.FindAccessibleNodeForGoal(tmpStart, tmpGoalPoint, goals, finalGoals);
@@ -1155,33 +1158,33 @@ bool agent_pnr::ComputePAREnv() {
 
 				return false;
 			}
-			ag->PARGoal = PARMap.GetPoint(tmpGoal);
+			ag->PARGoal = PARMap.GetPoint(tmpGoal);		// única instancia dd cambias?
 		}
 		else {
 			tmpGoal = PARMap.GetClosestNode(ag->PARGoal);
 		}
 
 
-		starts.insert({tmpStart.i * PARMap.GetWidth() + tmpStart.j, tmpStart});
-		if ((tmpGoalPoint - ag->goal).EuclideanNorm() < options->delta) {
+		starts.insert({tmpStart.i * PARMap.GetWidth() + tmpStart.j, tmpStart});	// guarda pos inicial
+		if ((tmpGoalPoint - ag->goal).EuclideanNorm() < options->delta) {		// si la meta actual del subMap está cerca de la meta final del ag
 //            if(finalGoals.find(tmpGoal.i * PARMap.GetWidth() + tmpGoal.j) != finalGoals.end())
 //            {
 //                std::cout << "AAAAAA 3\n";
 //            }
-			finalGoals.insert({tmpGoal.i * PARMap.GetWidth() + tmpGoal.j, tmpGoal});
+			finalGoals.insert({tmpGoal.i * PARMap.GetWidth() + tmpGoal.j, tmpGoal});	// utilizado para FindAccessibleNodeForGoal (undesirable)
 		}
 		else {
 //            if(goals.find(tmpGoal.i * PARMap.GetWidth() + tmpGoal.j) != goals.end())
 //            {
 //                std::cout << "AAAAAA 3\n";
 //            }
-			goals.insert({tmpGoal.i * PARMap.GetWidth() + tmpGoal.j, tmpGoal});
+			goals.insert({tmpGoal.i * PARMap.GetWidth() + tmpGoal.j, tmpGoal});		// utilizado para FindAccessibleNodeForGoal (ocuppied)
 		}
 
 		PARSet.addActor(tmpStart.i, tmpStart.j, tmpGoal.i, tmpGoal.j);
-		if (ag == this) {
-			PARActorId = PARSet.getActorId(tmpStart.i, tmpStart.j);
-			currPARPos = 0;
+		if (ag == this) {		// desconozco la utilidad de esto por el momento...
+			PARActorId = PARSet.getActorId(tmpStart.i, tmpStart.j);		
+			currPARPos = 0;		// a lo mjr se usa como referencia el pto de quien llama PAR
 		}
 	}
 	return true;
@@ -1189,9 +1192,9 @@ bool agent_pnr::ComputePAREnv() {
 
 
 bool agent_pnr::ComputePAR() {
-	PARsearch = Astar<>(false);
-	PARSolver = PushAndRotate(&PARsearch);
-	PARres = PARSolver.startSearch(PARMap, conf, PARSet);
+	PARsearch = Astar<>(false);		// Astar hereda de la clase ISearch
+	PARSolver = PushAndRotate(&PARsearch);	// PushAndRotate hereda de la clase MAPFSearchInterface
+	PARres = PARSolver.startSearch(PARMap, conf, PARSet);	// en qué momento se inicializa conf... // cómo funciona PARSet...
 	return PARres.pathfound;
 }
 
@@ -1201,7 +1204,7 @@ std::vector<std::pair<float, Agent *>> &agent_pnr::GetNeighbours() {
 }
 
 
-Point agent_pnr::GetGoalPointForMAPF(SubMap Area) {
+Point agent_pnr::GetGoalPointForMAPF(SubMap Area) {		// roba metas del planner que se encuentran dentro del subMapa, y las asigna a buffPar
 	Point nextPoint = planner->PullOutNext();
 	buffPar.push_back(nextPoint);
 

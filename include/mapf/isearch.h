@@ -76,7 +76,7 @@ class ISearch {
 		getPerfectHeuristic(const SubMap &map, const MAPFActorSet &agentSet);
 
 		// void getPerfectHeuristic(const Map &map, const AgentSet &agentSet);
-		virtual double computeHFromCellToCell(int start_i, int start_j, int fin_i, int fin_j) { return 0; }
+			virtual double computeHFromCellToCell(int start_i, int start_j, int fin_i, int fin_j) { return 0; }
 
 		static int T;
 
@@ -122,7 +122,7 @@ class ISearch {
 		bool breakingties;//flag that sets the priority of nodes in addOpen function when their F-values is equal
 		SearchQueue<NodeType> open;
 		std::unordered_map<int, NodeType> close;
-		bool withTime;
+		bool withTime;	// ???
 		//need to define open, close;
 
 };

@@ -131,12 +131,12 @@ std::list<NodeType> ISearch<NodeType>::findSuccessors(const NodeType &curNode, c
 		for (int dj = -1; dj <= 1; ++dj) {
 			int newi = curNode.i + di, newj = curNode.j + dj;
 			if ((di == 0 || dj == 0) && (canStay() || di != 0 || dj != 0) && map.CellOnGrid(newi, newj) &&
-				map.CellIsTraversable(newi, newj, occupiedNodes)) {
-				int newh = computeHFromCellToCell(newi, newj, goal_i, goal_j);
-				NodeType neigh(newi, newj, nullptr, curNode.g + 1, newh);
-				neigh.conflictsCount = CAT.getAgentsCount(neigh);
+				map.CellIsTraversable(newi, newj, occupiedNodes)) {		// exploramos en cruz y no se encuentra en occupiedNodes
+				int newh = computeHFromCellToCell(newi, newj, goal_i, goal_j);	// retorna la distancia manhattan de dos puntos (x,y)
+				NodeType neigh(newi, newj, nullptr, curNode.g + 1, newh);	
+				neigh.conflictsCount = CAT.getAgentsCount(neigh);	// retorna num ag en el nodo en ese lugar y momento (?)
 				createSuccessorsFromNode(curNode, neigh, successors, agentId, constraints, CAT,
-										 neigh.i == goal_i && neigh.j == goal_j);
+										 neigh.i == goal_i && neigh.j == goal_j);	// pushea a successors si cumple "condiciones"
 			}
 		}
 	}
@@ -191,9 +191,9 @@ template<typename NodeType>
 void ISearch<NodeType>::createSuccessorsFromNode(const NodeType &cur, NodeType &neigh, std::list<NodeType> &successors,
 												 int agentId, const ConstraintsSet &constraints,
 												 const ConflictAvoidanceTable &CAT, bool isGoal) {
-	if (!constraints.hasNodeConstraint(neigh.i, neigh.j, neigh.g, agentId) &&
-		!constraints.hasEdgeConstraint(neigh.i, neigh.j, neigh.g, agentId, cur.i, cur.j)) {
-		setHC(neigh, cur, CAT, isGoal);
+	if (!constraints.hasNodeConstraint(neigh.i, neigh.j, neigh.g, agentId) &&		// 
+		!constraints.hasEdgeConstraint(neigh.i, neigh.j, neigh.g, agentId, cur.i, cur.j)) {		// ojo, se usa neigh.g como time
+		setHC(neigh, cur, CAT, isGoal);		// hace nada (definición vacía para Astar)
 		successors.push_back(neigh);
 	}
 }

@@ -6,8 +6,8 @@ void MAPFActorSet::clear() {
 }
 
 void MAPFActorSet::addActor(int start_i, int start_j, int goal_i, int goal_j) {
-	occupiedNodes[std::make_pair(start_i, start_j)] = actors.size();
-	actors.push_back(MAPFActor(start_i, start_j, goal_i, goal_j, actors.size()));
+	occupiedNodes[std::make_pair(start_i, start_j)] = actors.size();	// nodos ocupados en esa posición es actors.size()?
+	actors.push_back(MAPFActor(start_i, start_j, goal_i, goal_j, actors.size()));	// por alguna razón el id es actors.size()?
 }
 
 void MAPFActorSet::setActorPosition(int actorId, Node pos) {

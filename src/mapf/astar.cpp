@@ -11,7 +11,7 @@ template<typename NodeType>
 double Astar<NodeType>::computeHFromCellToCell(int i1, int j1, int i2, int j2) {
 	auto it = this->perfectHeuristic.find(std::make_pair(NodeType(i1, j1), NodeType(i2, j2)));
 	if (it != this->perfectHeuristic.end()) {
-		return it->second;
+		return it->second;	// entrega valor del unordered_map perfectHeuristic		// perfectHeuristic lo activa cbs.cpp (pero no sé si se utiliza)
 	}
 	return metric(i1, j1, i2, j2) * this->hweight;
 }

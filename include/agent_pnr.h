@@ -75,10 +75,10 @@ class agent_pnr : public Agent {
 		bool UpdatePAR();
 
 
-		SubMap PARMap;
-		MAPFActorSet PARSet;
-		MAPFConfig conf;
-		std::set<agent_pnr *> PARAgents;
+		SubMap PARMap;		// submapa de PAR inicializado en ComputePAREnv()
+		MAPFActorSet PARSet;	// uh??? init en ComputePAREnv()
+		MAPFConfig conf;	// config usada en ComputePAR
+		std::set<agent_pnr *> PARAgents;	// ags de un PAR
 		float fakeRadius;	// uh???
 		bool inPARMode;	// uh???	// true al ejecutar PreparePARExecution()
 		bool moveToPARPos;		// true al ejecutar PreparePARExecution()
@@ -93,9 +93,9 @@ class agent_pnr : public Agent {
 		Astar<> PARsearch;
 		PushAndRotate PARSolver;
 		MAPFSearchResult PARres;
-		int currPARPos;
-		int PARActorId;
-		std::vector<Point> buffPar;
+		int currPARPos;		// ?? init en ComputePAREnv()
+		int PARActorId;		// 
+		std::vector<Point> buffPar;	// roba metas del planner válidas para el submapa del PAR. Inicializado en GetGoalPointForMAPF()
 
 		int initCount;
 		int updCount;

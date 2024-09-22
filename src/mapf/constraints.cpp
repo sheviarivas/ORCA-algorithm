@@ -4,11 +4,11 @@ void ConstraintsSet::addNodeConstraint(int i, int j, int time, int agentId) {
 	nodeConstraints.insert(Constraint(i, j, time, agentId));
 }
 
-void ConstraintsSet::addGoalNodeConstraint(int i, int j, int time, int agentId) {
+void ConstraintsSet::addGoalNodeConstraint(int i, int j, int time, int agentId) {	// llamado en addAgentPath
 	goalNodeConstraints.insert(Constraint(i, j, time, agentId, -1, -1, true));
 }
 
-void ConstraintsSet::addEdgeConstraint(int i, int j, int time, int agentId, int prevI, int prevJ) {
+void ConstraintsSet::addEdgeConstraint(int i, int j, int time, int agentId, int prevI, int prevJ) { // llamado en addAgentPath
 	edgeConstraints.insert(Constraint(i, j, time, agentId, prevI, prevJ));
 }
 
@@ -74,9 +74,9 @@ bool ConstraintsSet::hasNodeConstraint(int i, int j, int time, int agentId) cons
 	if (nodeConstraints.find(Constraint(i, j, time, agentId)) != nodeConstraints.end()) {
 		return true;
 	}
-	auto constraint = goalNodeConstraints.lower_bound(Constraint(i, j, 0));
+	auto constraint = goalNodeConstraints.lower_bound(Constraint(i, j, 0));		// ojo que time = 0 (no se considera el tiempo de cada acción?)	
 	return constraint != goalNodeConstraints.end() && constraint->i == i && constraint->j == j &&
-		   constraint->time <= time;
+		   constraint->time <= time;																// woah		// falta saber qué significa goalNodeConstraints
 }
 
 bool ConstraintsSet::hasFutureConstraint(int i, int j, int time, int agentId) const {

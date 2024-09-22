@@ -16,9 +16,9 @@ class MAPFActorSet {
 		int width;
 		int height;
 		std::map<std::pair<int, int>, int> occupiedNodes;
-		std::map<std::pair<int, int>, int> connectivityComponents;
+		std::map<std::pair<int, int>, int> connectivityComponents;	// saber dd se inicializa...
 		std::vector<int> componentSizes;
-		std::multimap<std::pair<int, int>, int> subgraphNodes;
+		std::multimap<std::pair<int, int>, int> subgraphNodes;	// saber dd se inicializa...
 		std::set<std::pair<int, int>> subgraphPriorities;
 		std::vector<MAPFActor> actors;
 
