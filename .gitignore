@@ -6,6 +6,7 @@
 /malitoBuild
 /.vscode
 README.html
-/paper_tasks
+/task_examples
 /buildOld
 /malitoBuildOld
+/paper_tasks/**/*log*.*
