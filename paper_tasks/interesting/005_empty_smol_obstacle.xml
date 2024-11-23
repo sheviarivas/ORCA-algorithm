@@ -1,0 +1,82 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root>
+    <agents number="10" type="orca">
+	    <default_parameters size="0.35" movespeed="0.1" agentsmaxnum="10" timeboundary="5.4" sightradius="3.0" timeboundaryobst="33"/>
+        <agent id="0" start.xr="0.6" start.yr="0.5" goal.xr="1.5" goal.yr="7.5"/>  <!-- con x < 0.6 no traspasa el obstáculo. size= 0.35 // x=0.5, size=0.4 bucle //  -->
+        <agent id="1" start.xr="30.5" start.yr="16.5" goal.xr="1.5" goal.yr="16.5"/>
+        <agent id="2" start.xr="13.5" start.yr="22.5" goal.xr="19.5" goal.yr="25.5"/>
+        <agent id="3" start.xr="6.5" start.yr="9.5" goal.xr="9.5" goal.yr="9.5"/>
+        <agent id="4" start.xr="30.5" start.yr="30.5" goal.xr="26.5" goal.yr="24.5"/>
+        <agent id="5" start.xr="25.5" start.yr="25.5" goal.xr="18.5" goal.yr="25.5"/>
+        <agent id="6" start.xr="12.5" start.yr="4.5" goal.xr="9.5" goal.yr="11.5"/>
+        <agent id="7" start.xr="11.5" start.yr="4.5" goal.xr="22.5" goal.yr="6.5"/>
+        <agent id="8" start.xr="17.5" start.yr="9.5" goal.xr="6.5" goal.yr="10.5"/>
+        <agent id="9" start.xr="1.5" start.yr="1.5" goal.xr="2.5" goal.yr="6.5"/>   <!-- Para el obstáculo -->
+    </agents>
+
+    <obstacles number="2" >
+        <obstacle>
+            <vertex xr="0" yr="0"/>
+            <vertex xr="1" yr="1"/>
+            <vertex xr="1" yr="8"/>
+            <vertex xr="0" yr="8"/>
+            <vertex xr="0" yr="0"/>
+        </obstacle>
+        <obstacle>
+            <vertex xr="2" yr="0"/>
+            <vertex xr="3" yr="1"/>
+            <vertex xr="3" yr="8"/>
+            <vertex xr="2" yr="8"/>
+        </obstacle>
+        <obstacle>
+            <vertex xr="6" yr="32"/>
+            <vertex xr="6" yr="31"/>
+            <vertex xr="9" yr="31"/>
+            <vertex xr="9" yr="32"/>
+        </obstacle>
+    </obstacles>
+    <map>
+        <width>16</width>
+        <height>16</height>
+        <cellsize>1</cellsize>
+        <grid>
+            <!-- 5 --> <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <!-- 4 --> <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <!-- 3 --> <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <!-- 2 --> <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <!-- 1 --> <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <!-- - --> <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <!-- 9 --> <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <!-- 8 --> <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <!-- 7 --> <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <!-- 6 --> <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <!-- 5 --> <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <!-- 4 --> <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <!-- 3 --> <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <!-- 2 --> <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <!-- 0 --> <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+            <!-- 1 --> <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+                       <!-- 0 1 2 3 4 5 6 7 8 9 - 1 2 3 4 5 -->
+    </grid>
+    </map>
+    <algorithm>
+        <searchtype>thetastar</searchtype>
+        <breakingties>0</breakingties>
+        <allowsqueeze>false</allowsqueeze>
+        <cutcorners>false</cutcorners>
+        <hweight>1</hweight>
+        <timestep>0.1</timestep>
+        <delta>0.1</delta>
+        <trigger>common-point</trigger>
+        <mapfnum>3</mapfnum>
+    </algorithm>
+</root>
+
+<!-- 
+
+observación:
+    <agent id="0" start.xr="0.6" start.yr="0.5" goal.xr="1.5" goal.yr="7.5"/>  <!-- con x < 0.6 no traspasa el obstáculo. size= 0.35 // x=0.5, size=0.4 bucle //  -->
+
+-->
+
+<!--  -->
