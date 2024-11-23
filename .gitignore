@@ -10,3 +10,5 @@ README.html
 /buildOld
 /malitoBuildOld
 /paper_tasks/**/*log*.*
+/paper_tasks/**/*.txt
+/vanillaBuild
