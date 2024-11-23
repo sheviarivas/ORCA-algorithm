@@ -644,10 +644,10 @@ void PushAndRotate::getSubgraphs(const SubMap &map, MAPFActorSet &agentSet) {
 
 						std::list<Node> successors = search->findSuccessors(cur, map);	// search aquí es Astar		// sucesores que estén en el mapa y que no tengan problemas con restricciones
 						std::list<Node>::iterator it = successors.begin();
-						for (int i = 0; i < lastInd; ++i, ++it) {}	// mueve it lasInd veces
+						for (int i = 0; i < lastInd; ++i, ++it) {}	// mueve it lastInd veces
 						if (lastInd == -1) {	// <> cur se visita por primera vez (no se han procesado vecinos)
 							close.insert(cur);
-							agentSet.setConnectedComponent(cur.i, cur.j, connectedComponentNum);
+							agentSet.setConnectedComponent(cur.i, cur.j, connectedComponentNum);	// id de components es connectedComponentNum
 							in[cur] = depth;
 							up[cur] = depth;
 						}
@@ -659,17 +659,17 @@ void PushAndRotate::getSubgraphs(const SubMap &map, MAPFActorSet &agentSet) {
 									joinNodes.insert(cur);
 								}
 							}
-							up[cur] = std::min(up[*it], up[cur]);
+							up[cur] = std::min(up[*it], up[cur]);	// <> 
 							it = std::next(it);
 						}
 						for (it, lastInd = lastInd + 1; it != successors.end(); ++it, ++lastInd) {
 							if (close.find(*it) != close.end()) {		// si pillé un vecino visitado
-								up[cur] = std::min(in[*it], up[cur]);	// actualizamos up
+								up[cur] = std::min(in[*it], up[cur]);	// <> ver si puedo no pasar por el nodo padre. ver posibles ciclos
 							}
 							else {
 								std::pair<Node, Node> curEdge = std::make_pair(cur, *it);	// <> se crea arista
 								edgeStack.push_back(curEdge);
-								std::get<1>(stack.back()) = lastInd;	// actualiza lastInd
+								std::get<1>(stack.back()) = lastInd;	// actualiza lastInd del nodo
 								stack.push_back(std::make_tuple(*it, -1, depth + 1));	// añadimos al stack
 								break;
 							}
@@ -686,7 +686,7 @@ void PushAndRotate::getSubgraphs(const SubMap &map, MAPFActorSet &agentSet) {
 		}
 	}
 
-	for (int i = 0; i < map.GetHeight(); ++i) {
+	for (int i = 0; i < map.GetHeight(); ++i) {				// añadiendo vértices de grado 3 que no sean parte de un subgrafo
 		for (int j = 0; j < map.GetWidth(); ++j) {
 			if (!map.CellIsObstacle(i, j) && map.GetCellDegree(i, j) >= 3 && agentSet.getSubgraphs(i, j).empty()) {
 				agentSet.setNodeSubgraph(i, j, components.size());
@@ -710,7 +710,7 @@ void PushAndRotate::getSubgraphs(const SubMap &map, MAPFActorSet &agentSet) {
 	std::sort(order.begin(), order.end(),
 			  [&components](const int a, const int b) { return components[a].size() > components[b].size(); });
 
-	for (int i: order) {
+	for (int i: order) {	// por cada componente de mayor a menor tamaño... la idea es fusionar componentes de distancia menor o igual a m - 2
 		for (auto start: components[i]) {
 			if (joinNodes.find(start) != joinNodes.end()) {
 				combineNodeSubgraphs(agentSet, components, start, i);
@@ -757,17 +757,17 @@ void PushAndRotate::assignToSubgraphs(const SubMap &map, MAPFActorSet &agentSet)
 	std::vector<int> agentsInConnectedComponents(agentSet.getConnectedComponentsCount());
 	for (int i = 0; i < agentSet.getActorCount(); ++i) {
 		MAPFActor agent = agentSet.getActor(i);
-		++agentsInConnectedComponents[agentSet.getConnectedComponent(agent.getCur_i(), agent.getCur_j())];	// cuenta cuantos ag hay por cada componente conectado?
+		++agentsInConnectedComponents[agentSet.getConnectedComponent(agent.getCur_i(), agent.getCur_j())];	// cuenta agentes de cada componente
 	}
 
 	int m = map.GetEmptyCellCount() - agentSet.getActorCount();
 	for (int i = 0; i < map.GetHeight(); ++i) {
 		for (int j = 0; j < map.GetWidth(); ++j) {
-			if (map.CellIsObstacle(i, j)) {		// si no es transitable
+			if (map.CellIsObstacle(i, j)) {		// no debo ser obs
 				continue;
 			}
 			Node pos(i, j);
-			auto subgraphs = agentSet.getSubgraphs(pos.i, pos.j);
+			auto subgraphs = agentSet.getSubgraphs(pos.i, pos.j);	// eto ta raro...	// obtendrá todos los subgrafos de los agentes?
 			if (subgraphs.empty()) {
 				continue;
 			}
@@ -779,7 +779,7 @@ void PushAndRotate::assignToSubgraphs(const SubMap &map, MAPFActorSet &agentSet)
 			bool hasSuccessorsInOtherSubgraph = false;
 			for (auto neigh: successors) {
 				auto neighSubgraphs = agentSet.getSubgraphs(neigh.i, neigh.j);
-				if (neighSubgraphs.empty() || neighSubgraphs[0] != subgraph) {
+				if (neighSubgraphs.empty() || neighSubgraphs[0] != subgraph) {	// vecino debe pertenecer a un subgrafo distinto al de los agentes
 					hasSuccessorsInOtherSubgraph = true;
 					int throughNeigh = getReachableNodesCount(map, agentSet, neigh, isUnoccupied, {pos});
 					int m1 = totalCount - throughNeigh;
@@ -796,7 +796,7 @@ void PushAndRotate::assignToSubgraphs(const SubMap &map, MAPFActorSet &agentSet)
 					auto path = searchResult.lppath;
 					int agentCount = 0;
 					for (auto node: path) {
-						if (agentSet.isOccupied(node.i, node.j)) {
+						if (agentSet.isOccupied(node.i, node.j)) {	// weeeird...
 							if (agentCount >= m1 - 1) {
 								break;
 							}
@@ -825,11 +825,11 @@ void PushAndRotate::getPriorities(const SubMap &map, MAPFActorSet &agentSet) {
 	};
 	for (int i = 0; i < map.GetHeight(); ++i) {
 		for (int j = 0; j < map.GetWidth(); ++j) {
-			if (map.CellIsObstacle(i, j)) {
+			if (map.CellIsObstacle(i, j)) {		// saltamos obstáculos
 				continue;
 			}
 
-			auto subgraphs = agentSet.getSubgraphs(i, j);
+			auto subgraphs = agentSet.getSubgraphs(i, j);		// vértice debe pertenecer a un subgrafo
 			if (subgraphs.empty()) {
 				continue;
 			}
@@ -848,7 +848,7 @@ void PushAndRotate::getPriorities(const SubMap &map, MAPFActorSet &agentSet) {
 					path.push_front(Node(i, j));
 					for (auto node: path) {
 						auto it = goalPositions.find(node);
-						if (it == goalPositions.end()) {
+						if (it == goalPositions.end()) {		// tiene que ser un nodo meta
 							break;
 						}
 						MAPFActor agent = agentSet.getActor(it->second);

@@ -551,7 +551,7 @@ bool agent_pnr::UpdatePrefVelocity() {
 
 	Point next;
 	if (inPARMode) {	// falta saber qué es inPARMode
-		std::cout<<"uh1"<<std::endl;
+		// std::cout<<"uh1"<<std::endl;
 		if (PARUnion) {
 			UnitePAR();
 			prefV = Point();
@@ -560,7 +560,7 @@ bool agent_pnr::UpdatePrefVelocity() {
 		}
 
 		if (notPARVis) {
-			std::cout<<"uh2"<<std::endl;
+			// std::cout<<"uh2"<<std::endl;
 			UpdatePAR();
 			prefV = Point();
 			nextForLog = position;
@@ -568,7 +568,7 @@ bool agent_pnr::UpdatePrefVelocity() {
 		}
 
 		if (PARExec) {
-			std::cout<<"uh3"<<std::endl;
+			// std::cout<<"uh3"<<std::endl;
 			nextForLog = PARGoal;	// PARGoal?
 			bool allOnPos = true;
 			bool allFin = true;
@@ -615,7 +615,7 @@ bool agent_pnr::UpdatePrefVelocity() {
 				return true;
 			}
 			else {
-				prefV = Point();
+				prefV = Point();		// se queda aquí mismo
 				nextForLog = PARGoal;
 				return true;
 			}
@@ -673,7 +673,7 @@ bool agent_pnr::UpdatePrefVelocity() {
 	}
 	else {
 		if (PARVis) {	// falta saber qué es PARVis
-			std::cout<<"uh4"<<std::endl;
+			// std::cout<<"uh4"<<std::endl;
 			prefV = Point();
 			return true;
 		}
@@ -683,8 +683,8 @@ bool agent_pnr::UpdatePrefVelocity() {
 			float dist = goalVector.EuclideanNorm();	// largo o magniturd del vector
 			if ((options->trigger == MAPFTriggers::COMMON_POINT && CommonPointMAPFTrigger(dist)) ||				// falta forzar situaciones... listo: 004
 				(options->trigger == MAPFTriggers::SPEED_BUFFER && SingleNeighbourMeanSpeedMAPFTrigger())) {
-				std::cout<<"uh5"<<std::endl;
-				std::cout<<this->GetID()<< "\t" <<this->GetPosition().ToString()<<endl;
+				// std::cout<<"uh5"<<std::endl;
+				// std::cout<<this->GetID()<< "\t" <<this->GetPosition().ToString()<<endl;
 				PreparePARExecution();
 				prefV = Point();
 
@@ -787,7 +787,7 @@ void agent_pnr::PreparePARExecution() {
 	PARAgents.insert(this);
 	for (auto &el: Neighbours) {
 		agent_pnr *neighbour = dynamic_cast<agent_pnr *>(el.second);
-		if (!neighbour->inPARMode && !neighbour->waitForFinish) {	// entender condicional
+		if (!neighbour->inPARMode && !neighbour->waitForFinish) {	// entender condicional para waitForFinish
 			PARAgents.insert(neighbour);
 			neighbour->inPARMode = true;
 			neighbour->moveToPARPos = true;
@@ -826,7 +826,7 @@ void agent_pnr::PreparePARExecution() {
 				ag1->currPARPos = -1;
 				ag1->PARActorId = -1;
 			}
-			return;
+			return;	// qué implicancias tiene este caso...
 		}
 	}
 
@@ -1114,7 +1114,7 @@ bool agent_pnr::ComputePAREnv() {
 		Node tmpStart, tmpGoal;
 
 		if (ag->PARStart.X() < 0) {		// si no está inicializado
-			tmpStart = PARMap.FindCloseToPointAvailableNode(ag->GetPosition(), starts);
+			tmpStart = PARMap.FindCloseToPointAvailableNode(ag->GetPosition(), starts);	// reclama pos actual o la más cercana alrededor que se aleje menos de la meta
 
 			if (tmpStart.i < 0) {
 				for (auto &ag1: PARAgents) {

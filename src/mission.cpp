@@ -124,7 +124,7 @@ Summary Mission::StartMission() {
 			dynamic_cast<ORCAAgentWithPARAndECBS *>(agent)->SetMAPFInstanceLoggerRef(&MAPFLog);
 		}
 #endif
-		std::cout<<"Nodos Theta Agente "<<agent->GetID()<<std::endl<<std::endl;	// marcado
+		// std::cout<<"Nodos Theta Agente "<<agent->GetID()<<std::endl<<std::endl;	// marcado
 		bool found = agent->InitPath();
 #if FULL_OUTPUT
 		if (!found) {
@@ -141,6 +141,9 @@ Summary Mission::StartMission() {
 #endif
 
 	}
+
+	
+
 	bool needToStop, needToStopByTime, needToStopBySteps, needToStopBySpeed;
 	do {
 		AssignNeighbours();	// actualiza vecinos (ag. y obs.) añadiendo nuevos o quitando aquellos que se alejaron en el camino
@@ -255,7 +258,12 @@ bool Mission::SaveLog() {
 void Mission::UpdateSate() {
 	size_t i = 0;
 	allStops = true;
-	std::cout<< "Step "<< stepsCount<< std::endl;
+	bool printYAML = false;
+	bool printPositions = true;
+	if (printPositions) ::cout<< "Step "<< stepsCount<< std::endl;
+	if (printYAML){
+		std::cout<< "    - ";
+	} 
 	for (auto &agent: agents) {
 		agent->ApplyNewVelocity();	// actualiza currV y meanSavedSpeed. Otros parámetros quedan en false
 		Point newPos = agent->GetPosition() + (agent->GetVelocity() * options->timestep);
@@ -284,9 +292,19 @@ void Mission::UpdateSate() {
 		goalsLog[agent->GetID()].push_back(agent->GetNext());
 #endif
 		i++;
-		std::cout<< "Posición Ag " << agent->GetID()<< ": " << agent->GetPosition().ToString()<< std::endl;
+		if (printPositions) std::cout << agent->GetPosition().ToString()<< std::endl;
+		if (printYAML){
+			if (agent->GetID()==0){
+				std::cout << "- " << agent->GetPosition().ToString()<< std::endl;
+			}
+			else{
+				std::cout << "      - " << agent->GetPosition().ToString()<< std::endl;
+			}
+			
+		} 
+		// std::cout<< "Posición Ag " << agent->GetID()<< ": " << agent->GetPosition().ToString()<< std::endl;
 	}
-	std::cout<< std::endl;
+	if (printPositions) std::cout<< std::endl;
 
 	stepsCount++;
 }

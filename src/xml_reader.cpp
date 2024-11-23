@@ -232,18 +232,18 @@ bool XMLReader::ReadMap() {
 		stream.str("");
 		stream.clear();
 
-		if (value != CNS_TAG_GRID) {
+		if (value != CNS_TAG_GRID) {	// si no soy grid
 			stream << element->GetText();
 		}
 
 		if (!hasGridMem && hasHeight && hasWidth) {
 			grid = new std::vector<std::vector<int>>(height);
 			for (int i = 0; i < height; ++i)
-				(*grid)[i] = std::vector<int>(width);
+				(*grid)[i] = std::vector<int>(width);	// dejamos espacio para el grid
 			hasGridMem = true;
 		}
 
-		if (value == CNS_TAG_HEIGHT) {
+		if (value == CNS_TAG_HEIGHT) {	// si soy height
 			if (hasHeight) {
 #if FULL_OUTPUT
 				std::cout << "Warning! Duplicate '" << CNS_TAG_HEIGHT << "' encountered." << std::endl;
@@ -266,15 +266,15 @@ bool XMLReader::ReadMap() {
 				}
 			}
 		}
-		else if (value == CNS_TAG_WIDTH) {
-			if (hasWidth) {
+		else if (value == CNS_TAG_WIDTH) {	// si soy width
+			if (hasWidth) {	// liderar con duplicados
 #if FULL_OUTPUT
 				std::cout << "Warning! Duplicate '" << CNS_TAG_WIDTH << "' encountered." << std::endl;
 				std::cout << "Only first value of '" << CNS_TAG_WIDTH << "' =" << width << "will be used." << std::endl;
 #endif
 			}
 			else {
-				if (!((stream >> width) && (width > 0))) {
+				if (!((stream >> width) && (width > 0))) {	// si width no tiene valor, o que este mismo sea menor o igual a 0
 #if FULL_OUTPUT
 					std::cout << "Warning! Invalid value of '" << CNS_TAG_WIDTH
 							  << "' tag encountered (or could not convert to integer)." << std::endl;
@@ -288,7 +288,7 @@ bool XMLReader::ReadMap() {
 				}
 			}
 		}
-		else if (value == CNS_TAG_CELLSIZE) {
+		else if (value == CNS_TAG_CELLSIZE) {	// si soy cellsize
 			if (hasCellSize) {
 #if FULL_OUTPUT
 				std::cout << "Warning! Duplicate '" << CNS_TAG_CELLSIZE << "' encountered." << std::endl;
@@ -311,7 +311,7 @@ bool XMLReader::ReadMap() {
 					hasCellSize = true;
 			}
 		}
-		else if (value == CNS_TAG_GRID) {
+		else if (value == CNS_TAG_GRID) {	// si soy grid
 			hasGrid = true;
 			if (!(hasHeight && hasWidth)) {
 				std::cout << "Error! No '" << CNS_TAG_WIDTH << "' tag or '" << CNS_TAG_HEIGHT << "' tag before '"
@@ -319,7 +319,7 @@ bool XMLReader::ReadMap() {
 				return false;
 			}
 			element = mapnode->FirstChildElement();
-			while (gridI < height) {
+			while (gridI < height) {	// contador de rows
 				if (!element) {
 					std::cout << "Error! Not enough '" << CNS_TAG_ROW << "' tags inside '" << CNS_TAG_GRID << "' tag."
 							  << std::endl;

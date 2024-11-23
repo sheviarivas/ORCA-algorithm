@@ -279,18 +279,18 @@ float ThetaStar::Distance(int i1, int j1, int i2, int j2) const {
 
 
 void ThetaStar::MakePrimaryPath(Node curNode) {
-	std::cout<< "MakePrimaryPath"<<std::endl;
+	// std::cout<< "MakePrimaryPath"<<std::endl;
 	Node current = curNode;
 	while (current.parent) {
-		std::cout<<map->GetPoint(current).ToString();
-		std::cout<<"\n";	
+		// std::cout<<map->GetPoint(current).ToString();
+		// std::cout<<"\n";	
 		currPath.push_front(map->GetPoint(current));
 		current = *current.parent;
 	}
-	std::cout<<map->GetPoint(current).ToString();	// comentado originalmente
+	// std::cout<<map->GetPoint(current).ToString();	// comentado originalmente
 	// std::cout<<map->GetPoint(current).ToString();
-	std::cout<<"\n";	
-	std::cout<<"\n";	
+	// std::cout<<"\n";	
+	// std::cout<<"\n";	
 }
 
 

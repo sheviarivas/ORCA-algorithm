@@ -345,7 +345,7 @@ Node SubMap::FindCloseToPointAvailableNode(Point pos, std::unordered_map<int, No
 
 		for (auto &s: successors) {
 			if (CellOnGrid(s.i, s.j)) {
-				if (CellIsObstacle(curr.i, curr.j) || CellIsTraversable(s.i, s.j)) {
+				if (CellIsObstacle(curr.i, curr.j) || CellIsTraversable(s.i, s.j)) {	// por qué si CellIsObstacle?
 					if (close.find(s.i * GetWidth() + s.j) == close.end() &&
 						openDupl.find(s.i * GetWidth() + s.j) == openDupl.end()) {
 						s.H = (this->GetPoint(s) - pos).SquaredEuclideanNorm();

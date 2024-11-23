@@ -11,7 +11,7 @@
 #define ORCA_PARACTORSET_H
 
 
-class MAPFActorSet {
+class MAPFActorSet {  // será quien guarda el conjunto de actores relacionados a un subgrafo??
 	private:
 		int width;
 		int height;
