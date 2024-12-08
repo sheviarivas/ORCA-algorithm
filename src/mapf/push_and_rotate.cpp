@@ -493,7 +493,7 @@ bool PushAndRotate::solve(const SubMap &map, const MAPFConfig &config, MAPFActor
 	MAPFActor curAgent;
 	while (!notFinished.empty()) {
 		std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-		if (std::chrono::duration_cast<std::chrono::milliseconds>(now - begin).count() > config.maxTime) {
+		if (std::chrono::duration_cast<std::chrono::milliseconds>(now - begin).count() > config.maxTime) {	// qué eres?
 			return false;
 		}
 
@@ -630,7 +630,7 @@ void PushAndRotate::getSubgraphs(const SubMap &map, MAPFActorSet &agentSet) {
 		for (int j = 0; j < map.GetWidth(); ++j) {	// vemos todo i,j del submapa
 			if (!map.CellIsObstacle(i, j)) {
 				Node curNode = Node(i, j);
-				if (close.find(curNode) == close.end()) {		// si no lo pillo en close buscamos su componente conectado
+				if (close.find(curNode) == close.end()) {		// si no lo pillo en close buscamos su componente biconectado
 					int oldSize = close.size();		// <> cuantos nodos han sido explorados hasta el momento 
 					std::vector<std::pair<Node, Node>> edgeStack;	// <> Pila que almacena las aristas encontradas durante la exploración.	// <> Almacena aristas del componente actual.
 					std::unordered_map<Node, int, NodeHash> in, up;	// <> Almacenan tiempos de entrada (in) y valores mínimos alcanzables (up) de los nodos para la detección de puentes y puntos de articulación.	// <> mantienen la profundidad y el valor mínimo de conexión de los nodos.
@@ -686,7 +686,7 @@ void PushAndRotate::getSubgraphs(const SubMap &map, MAPFActorSet &agentSet) {
 		}
 	}
 
-	for (int i = 0; i < map.GetHeight(); ++i) {				// añadiendo vértices de grado 3 que no sean parte de un subgrafo
+	for (int i = 0; i < map.GetHeight(); ++i) {				// añadiendo vértices de grado 3 que no sean parte de un componente biconectado
 		for (int j = 0; j < map.GetWidth(); ++j) {
 			if (!map.CellIsObstacle(i, j) && map.GetCellDegree(i, j) >= 3 && agentSet.getSubgraphs(i, j).empty()) {
 				agentSet.setNodeSubgraph(i, j, components.size());
@@ -774,12 +774,12 @@ void PushAndRotate::assignToSubgraphs(const SubMap &map, MAPFActorSet &agentSet)
 			int subgraph = subgraphs[0];
 			auto successors = search->findSuccessors(pos, map);			// no entiendo como funniona...
 			int totalCount = agentSet.getComponentSize(pos.i, pos.j) -	
-							 agentsInConnectedComponents[agentSet.getConnectedComponent(pos.i, pos.j)];		// no entiendo como funciona...	// tamaño del componente conectado actual menos los agentes asignados a este componente.
+							 agentsInConnectedComponents[agentSet.getConnectedComponent(pos.i, pos.j)];	// tamaño del componente conectado actual menos los agentes asignados a este componente.
 			int throughPos = 0;
 			bool hasSuccessorsInOtherSubgraph = false;
 			for (auto neigh: successors) {
 				auto neighSubgraphs = agentSet.getSubgraphs(neigh.i, neigh.j);
-				if (neighSubgraphs.empty() || neighSubgraphs[0] != subgraph) {	// vecino debe pertenecer a un subgrafo distinto al de los agentes
+				if (neighSubgraphs.empty() || neighSubgraphs[0] != subgraph) {	// vecino debe pertenecer a un subgrafo, distinto al de los agentes
 					hasSuccessorsInOtherSubgraph = true;
 					int throughNeigh = getReachableNodesCount(map, agentSet, neigh, isUnoccupied, {pos});
 					int m1 = totalCount - throughNeigh;
@@ -796,8 +796,8 @@ void PushAndRotate::assignToSubgraphs(const SubMap &map, MAPFActorSet &agentSet)
 					auto path = searchResult.lppath;
 					int agentCount = 0;
 					for (auto node: path) {
-						if (agentSet.isOccupied(node.i, node.j)) {	// weeeird...
-							if (agentCount >= m1 - 1) {
+						if (agentSet.isOccupied(node.i, node.j)) {	// weeeird...	// solo evalúo dd hay agentes
+							if (agentCount >= m1 - 1) {	// no podemos asignar más agentes
 								break;
 							}
 							agentSet.setActorSubgraph(agentSet.getActorId(node.i, node.j), subgraph);
@@ -837,7 +837,7 @@ void PushAndRotate::getPriorities(const SubMap &map, MAPFActorSet &agentSet) {
 			auto successors = search->findSuccessors(Node(i, j), map);
 			for (auto neigh: successors) {
 				auto neighSubgraphs = agentSet.getSubgraphs(neigh.i, neigh.j);
-				if (neighSubgraphs.empty() || neighSubgraphs[0] != subgraph) {
+				if (neighSubgraphs.empty() || neighSubgraphs[0] != subgraph) {	// si no somos del mismo subrafo
 					ISearch<> dijkstraSearch;
 					SearchResult searchResult = dijkstraSearch.startSearch(map, agentSet, neigh.i, neigh.j, 0, 0,
 																		   isGoal, true, true, 0, -1, -1, {Node(i, j)});
@@ -855,7 +855,7 @@ void PushAndRotate::getPriorities(const SubMap &map, MAPFActorSet &agentSet) {
 						int agentSubgraph = agent.getSubgraph();
 						if (agentSubgraph != -1) {
 							if (agentSubgraph != subgraph) {
-								agentSet.setPriority(subgraph, agentSubgraph);
+								agentSet.setPriority(subgraph, agentSubgraph);	// asigna prioridad
 							}
 							break;
 						}

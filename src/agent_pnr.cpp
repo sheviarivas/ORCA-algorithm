@@ -839,7 +839,7 @@ void agent_pnr::PreparePARExecution() {
 			unsuccessCount++;
 			for (auto &ag1: PARAgents) {
 				while (!ag1->buffPar.empty()) {
-					ag1->planner->AddPointToPath(ag1->buffPar.back());
+					ag1->planner->AddPointToPath(ag1->buffPar.back());	// aunque no se haya completado el PAR se moverán los ag?
 					ag1->buffPar.pop_back();
 				}
 
