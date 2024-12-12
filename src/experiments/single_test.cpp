@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
 	// se lee el .xml y se inicializan variables
 	if (task.ReadTask()) {
 		
-		bool printYAML = true;
+		bool printYAML = false;
 
 		if (printYAML){
 			std::cout<< "simulation:"<< std::endl;

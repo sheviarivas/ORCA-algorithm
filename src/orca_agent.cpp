@@ -18,6 +18,7 @@ void orca_agent::ComputeNewVelocity() {
 	ORCALines.clear();
 
 	// Получение ORCA-линий препятсвий
+	// Obtaining ORCA obstacle lines
 	for (int i = 0; i < NeighboursObst.size(); i++) {
 		Line line;
 

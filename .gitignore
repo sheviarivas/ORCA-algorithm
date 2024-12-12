@@ -12,3 +12,5 @@ README.html
 /paper_tasks/**/*log*.*
 /paper_tasks/**/*.txt
 /vanillaBuild
+/cnavBuild
+steps.yaml
