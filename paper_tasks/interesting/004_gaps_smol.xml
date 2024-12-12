@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <root>
-    <agents number="10" type="orca-par">
+    <agents number="10" type="cnav">
 	    <default_parameters size="0.3" movespeed="2.1" agentsmaxnum="10" timeboundary="5.4" sightradius="3.0" timeboundaryobst="33"/>
         <agent id="0" start.xr="3.5" start.yr="6.5" goal.xr="3.5" goal.yr="8.5"/>
         <agent id="1" start.xr="3.5" start.yr="8.5" goal.xr="5.5" goal.yr="6.5"/>

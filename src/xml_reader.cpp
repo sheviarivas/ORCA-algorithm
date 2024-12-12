@@ -793,7 +793,11 @@ bool XMLReader::ReadAgents() {
 		else if (agTypeStr == CNS_AT_ST_ORCARETURN) {
 			a = new ORCAAgentWithReturning(id, Point(stx, sty), Point(gx, gy), *map, *options, param);
 		}
-		else {
+		else if (agTypeStr == CNS_AT_ST_CNAV) {
+			a = new agent_cnav(id, Point(stx, sty), Point(gx, gy), *map, *options, param);
+		}
+		else
+		{
 			a = new orca_agent(id, Point(stx, sty), Point(gx, gy), *map, *options, param);
 		}
 

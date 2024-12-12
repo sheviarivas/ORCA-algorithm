@@ -60,7 +60,8 @@ SET(MA_NAV_LIB_SOURCES
         ${PROJECT_SOURCE_DIR}/src/mapf/scipp.cpp
         ${PROJECT_SOURCE_DIR}/src/mapf/sipp.cpp
         ${PROJECT_SOURCE_DIR}/src/agent_pnr_ecbs.cpp
-        ${PROJECT_SOURCE_DIR}/src/agent_returning.cpp)
+        ${PROJECT_SOURCE_DIR}/src/agent_returning.cpp
+        ${PROJECT_SOURCE_DIR}/src/agent_cnav.cpp)
 
 add_library(ma_navigation_lib STATIC ${MA_NAV_LIB_SOURCES})
 target_include_directories(ma_navigation_lib

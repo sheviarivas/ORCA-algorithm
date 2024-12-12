@@ -91,6 +91,7 @@
 #define CNS_AT_ST_ORCAPAR       "orca-par"
 #define CNS_AT_ST_ORCAPARECBS   "orca-par-ecbs"
 #define CNS_AT_ST_ORCARETURN    "orca-return"
+#define CNS_AT_ST_CNAV          "cnav"
 
 #define CNS_AT_ST_COMMONPOINT   "common-point"
 #define CNS_AT_ST_SPEEDBUFFER   "speed-buffer"

@@ -12,6 +12,7 @@
 #include "agent_pnr.h"
 #include "agent_pnr_ecbs.h"
 #include "agent_returning.h"
+#include "agent_cnav.h"
 
 
 #ifndef ORCA_XMLREADER_H

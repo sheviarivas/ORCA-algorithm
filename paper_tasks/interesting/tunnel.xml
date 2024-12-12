@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root>
+    <agents number="10" type="orca-par">
+	    <default_parameters size="0.3" movespeed="0.4" agentsmaxnum="10" timeboundary="5.4" sightradius="3.0" timeboundaryobst="33"/>
+        <agent id="0" start.xr="1.5" start.yr="1.5" goal.xr="5.5" goal.yr="1.5"/>
+        <agent id="1" start.xr="1.5" start.yr="2.5" goal.xr="5.5" goal.yr="2.5"/>
+        <agent id="2" start.xr="5.5" start.yr="1.5" goal.xr="1.5" goal.yr="1.5"/>
+        <!-- <agent id="3" start.xr="" start.yr="" goal.xr="" goal.yr=""/> -->
+        <!-- <agent id="3" start.xr="" start.yr="" goal.xr="" goal.yr=""/> -->
+    </agents>
+
+    <obstacles number="2" >
+        <obstacle>
+            <vertex xr="0" yr="0"/>
+            <vertex xr="7" yr="0"/>
+            <vertex xr="7" yr="4"/>
+            <vertex xr="0" yr="4"/>
+        </obstacle>
+        <obstacle>
+            <vertex xr="1" yr="1"/>
+            <vertex xr="6" yr="1"/>
+            <vertex xr="6" yr="3"/>
+            <vertex xr="1" yr="3"/>
+        </obstacle>
+    </obstacles>
+    <map>
+        <width>7</width>
+        <height>4</height>
+        <cellsize>1</cellsize>
+        <grid>
+            <!-- 3 --> <row>1 1 1 1 1 1 1</row>
+            <!-- 2 --> <row>1 0 0 0 0 0 1</row>
+            <!-- 1 --> <row>1 0 0 0 0 0 1</row>
+            <!-- 0 --> <row>1 1 1 1 1 1 1</row>
+                       <!-- 0 1 2 3 4 5 6 -->
+    </grid>
+    </map>
+    <algorithm>
+        <searchtype>thetastar</searchtype>
+        <breakingties>0</breakingties>
+        <allowsqueeze>false</allowsqueeze>
+        <cutcorners>false</cutcorners>
+        <hweight>1</hweight>
+        <timestep>0.1</timestep>
+        <delta>0.1</delta>
+        <trigger>common-point</trigger>
+        <mapfnum>3</mapfnum>
+    </algorithm>
+</root>
+
+<!-- 
+
+observación:
+puedo añadir observaciones al xml
+no hay problemas con caracteres de ningún tipo
+siempre y cuando esté el último tag como comentario, el archivo se puede leer sin problemas 
+
+puedo definir obstáculos a pesar de que estén fuera de los límites
+
+-->
+
+<!--  -->
