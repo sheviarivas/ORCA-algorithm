@@ -142,18 +142,50 @@ Summary Mission::StartMission() {
 
 	}
 
-	
-
 	bool needToStop, needToStopByTime, needToStopBySteps, needToStopBySpeed;
+
+
+
+
+	if (dynamic_cast<agent_cnav*>(agents[0]) != nullptr) {
+		std::cout << "hola cnav" << std::endl;
+		// inicializar prefV hacia meta
+	}
+	
 	do {
+		
+		// if (stepsCount > 2) {
+		// 	stepsCount = 0;
+		// 	for (auto &agent: agents) {
+		// 		// dynamic_cast<agent_cnav *>(agent)->
+		// 	}
+		// 	// agents = backupAgents;
+		// 	std::cout<< "get back!!" << std::endl;
+		// }
 		AssignNeighbours();	// actualiza vecinos (ag. y obs.) añadiendo nuevos o quitando aquellos que se alejaron en el camino
 
-		for (auto &agent: agents) {
-			agent->UpdatePrefVelocity();	// obtener dirección de vector hacia meta
+		if ( typeid(*agents[0]) == typeid(agent_cnav)){
+			// ask agents most constrained
+			std::vector<std::vector<int>> cRanks;	// no muy fan del nombre... pero bue
+			for (auto &agent: agents) {
+				std::vector<int> cRank;
+				dynamic_cast<agent_cnav *>(agent)->GetMostConstrainedNeighs(cRank);
+				cRanks.push_back(cRank);
+			}
+
+			// debería pasar de otra forma la simulacion? para pensar...
+			SimMotion(cRanks);
+
+			
+		} else {
+			for (auto &agent: agents) {
+				agent->UpdatePrefVelocity();	// obtener dirección de vector hacia meta
+			}
 		}
+		
 
 		for (auto &agent: agents) {
-			agent->ComputeNewVelocity();	// considerará otros ag., obstáculos, y celdas disponibles contra la dirección obtenida (?) 
+			agent->ComputeNewVelocity();	// considerará otros ag., obstáculos, y celdas disponibles contra la dirección obtenida (?)		// acá me parece que termina de funcionar toda la lógica de orca
 		}
 
 		UpdateSate();
@@ -166,6 +198,7 @@ Summary Mission::StartMission() {
 		needToStop = needToStopBySpeed or needToStopByTime or needToStopBySteps;
 
 	} while (!IsFinished() && !needToStop);
+
 
 	auto endpnt = std::chrono::high_resolution_clock::now();
 	size_t res = std::chrono::duration_cast<std::chrono::milliseconds>(endpnt - startpnt).count();
@@ -259,7 +292,7 @@ void Mission::UpdateSate() {
 	size_t i = 0;
 	allStops = true;
 	bool printYAML = false;
-	bool printPositions = true;
+	bool printPositions = false;
 	if (printPositions) ::cout<< "Step "<< stepsCount<< std::endl;
 	if (printYAML){
 		std::cout<< "    - ";
@@ -315,7 +348,7 @@ void Mission::AssignNeighbours() {
 
 		for (auto &neighbour: agents) {
 			if (agent != neighbour) {	// si no soy yo mismo
-				float distSq = (agent->GetPosition() - neighbour->GetPosition()).SquaredEuclideanNorm(); // (xa - xb) pow itself, same with y
+				float distSq = (agent->GetPosition() - neighbour->GetPosition()).SquaredEuclideanNorm(); // (xa - xb) pow itself, same with y, then add them up
 				agent->AddNeighbour(*neighbour, distSq);	// evaluamos si se añade o no a partir de su distancia
 			}
 		}
@@ -392,4 +425,152 @@ Mission &Mission::operator=(const Mission &obj) {
 		stopByMeanSpeed = obj.stopByMeanSpeed;
 	}
 	return *this;
+}
+
+std::unique_ptr<Mission> Mission::Clone() const {
+	// return new Mission(*this);
+	return std::make_unique<Mission>(*this);
+}
+
+
+bool Mission::SimMotion(std::vector<std::vector<int>> &cRanks){
+	// to do: entregar valores correctos de los parámetros k y T
+	int k = -1;
+	int T = -1;
+
+	// guardar valor Ra de cada ag
+	std::vector<int> Ra;
+
+	// clonar agentes
+	auto backupAgents = std::make_unique< vector<Agent *> >(agents);
+
+	// por cada ag
+	for (int i =0; i<this->agents.size(); ++i){
+
+		// std::cout<< agents[i]->GetID() << std::endl;	
+
+		std::vector<Velocity> actions;
+		// obtener prefV
+		agent_cnav* currOriginal = dynamic_cast<agent_cnav*>(agents[i]);
+		actions.push_back(currOriginal->GetPrefVelocity());
+
+		// aplicar grados beta y demás al resto de acciones
+		actions.push_back(Point(0,0));
+		actions.push_back(Point(0,0));
+		actions.push_back(Point(0,0));
+		actions.push_back(Point(0,0));
+
+		// guardar maxRa por cada accion
+		std::vector<std::pair<Velocity, float>> maxRa;	// acción y score
+
+		// por cada acción
+		for (auto &action: actions) {
+			float R_ca = 0;
+			float R_ga = 0;
+
+			// clonar Mission o Agentes
+			auto simulateTask = this->Clone();
+			agent_cnav* currSimulated = dynamic_cast<agent_cnav*>(simulateTask->agents[i]);
+			// std::cout<< currSimulated->GetID() << std::endl;
+
+			// podría llamar GetMostConstrained desde aquí
+
+			for (int t=0; t<T; ++t){
+				// simular ambiente a curr y vecinos
+				std::vector<std::pair<float, Agent *>> neighborhood = {std::make_pair(0, currSimulated)};
+				std::vector<std::pair<float, Agent *>> neighbours = currSimulated->GetNeighbours();
+				neighborhood.insert(neighborhood.end(), neighbours.begin(), neighbours.end());
+
+				for (auto &neigh: neighborhood) {
+					neigh.second->UpdatePrefVelocity();
+					neigh.second->ComputeNewVelocity();
+					simulateTask->UpdateSate();
+				}
+
+				std::vector<int> currSimulatedcRank = cRanks[i];
+				// o podria obtener cRank[i] aquí
+
+				if (t>0){
+					for(int j=0; j<k; ++j){
+						/*
+							necesito castear para obtener el cRank
+							pero necesito el cRank para poder castear
+						*/
+						agent_cnav* neigh_j = dynamic_cast<agent_cnav*>(neighbours[currSimulatedcRank[j]].second);
+						float maxV_j = neigh_j->GetMaxSpeed();
+						float intentV_j = neigh_j->GetIntentVelocity().EuclideanNorm();
+						float newV_j = neigh_j->GetVelocity().EuclideanNorm();
+
+						R_ca = R_ca + maxV_j - abs( intentV_j - newV_j );
+					}
+
+
+
+				}
+			}
+
+
+
+
+		}
+
+
+	}
+
+
+
+	// for (int t=0; t<T; ++t){
+
+	// 	for (auto &agent: simulateTask->agents) {
+	// 		// debería usar una copia del agente actual... ?
+	// 		agent_cnav* curr = dynamic_cast<agent_cnav*>(agent);
+	// 		curr->UpdatePrefVelocity();	// obtener dirección de vector hacia meta
+	// 		// tonces aquí debería crear la copia de la simulación
+	// 		// luego
+
+	// 		// aplicar acción a simulación cambiando prefV
+	// 		// me falta aplicarle los angulos pero pa dsp con los ángulos beta
+	// 		std::vector<Velocity> actions;
+	// 		// for... 
+	// 		for (auto &action: actions) {
+
+	// 		}
+	// 		curr->SetPrefVelocity(action);
+
+	// 		// luego aplicarle a la simulación a todos
+	// 		std::vector<std::pair<float, Agent *>> neighborhood = {std::make_pair(0, curr)};
+	// 		std::vector<std::pair<float, Agent *>> neighbours = curr->GetNeighbours();
+	// 		neighborhood.insert(neighborhood.end(), neighbours.begin(), neighbours.end());
+
+	// 		for (auto &neigh: neighborhood) {
+	// 			neigh.second->UpdatePrefVelocity();
+	// 			neigh.second->ComputeNewVelocity();
+	// 			simulateTask->UpdateSate();
+	// 		}
+
+	// 	}
+
+	// 	// iterar por cada ag luego de la sim para obtener la nueva data
+
+	// 	if (t>0){
+	// 		for(int j=0; j<k; ++j){
+	// 			agent_cnav* neigh_j = dynamic_cast<agent_cnav*>(Neighbours[cRank[j]].second);
+	// 			float maxV_j = neigh_j->maxSpeed;
+	// 			float intentV_j = neigh_j->GetIntentVelocity().EuclideanNorm();
+	// 			float newV_j = neigh_j->GetVelocity().EuclideanNorm();
+
+	// 			R_ca = R_ca + maxV_j - abs( intentV_j - newV_j );
+	// 		}
+	// 	}
+	// 	float newV_i = this->GetVelocity().EuclideanNorm();
+
+
+	// 	R_ga = R_ga; // + currV_i * posActual - meta / magnitud
+	// }
+
+	// R_ga;
+	// R_ga;
+	// delete(simulateTask);
+
+	return -1;
 }

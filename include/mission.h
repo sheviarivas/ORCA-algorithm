@@ -15,6 +15,9 @@
 #include "xml_logger.h"
 #include "mapf_instances_logger.h"
 
+#include <memory>
+
+
 using namespace tinyxml2;
 
 class Mission {
@@ -33,6 +36,10 @@ class Mission {
 		Summary StartMission();
 
 		Mission &operator=(const Mission &obj);
+
+		std::unique_ptr<Mission> Clone() const;
+
+		bool SimMotion(std::vector<std::vector<int>> &cRanks);
 
 #if FULL_LOG
 
