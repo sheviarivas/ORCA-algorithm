@@ -14,3 +14,5 @@ README.html
 /vanillaBuild
 /cnavBuild
 steps.yaml
+/otroBuild
+/build_renderer
