@@ -19,7 +19,7 @@ class Point():
         return f"Point({self.x}, {self.y})"
 
 class Renderer():
-    def __init__(self, window_width, window_height, cell_size = 50, origin = (5, 95), title= '', agents_default_param = {}, agents_init_pos = [], map = []):
+    def __init__(self, window_width, window_height, cell_size = 25, origin = (5, 95), title= '', agents_default_param = {}, agents_init_pos = [], map = []):
         self.window_width = window_width
         self.window_height = window_height
         self.screen = pygame.display.set_mode((self.window_width, self.window_height))
@@ -38,7 +38,9 @@ class Renderer():
         self.agents_default_param = agents_default_param
         self.agents_init_pos = agents_init_pos
         self.map = [['1', '1', '1'], ['0', '1', '1']]
-        # self.map = map
+
+        self.sightRadius = -1
+        self.radius = -1
 
     def set_title(self, title): 
         pygame.display.set_caption(title)
@@ -69,6 +71,16 @@ class Renderer():
     
     def draw_background(self, color):
         self.screen.fill(color)
+    
+    def draw_transparent_circle(self, x, y, radius = None, color = (255, 255, 255, 128)):
+        COLOR = (255, 255, 255, 128)  # Color with transparency
+        if radius is None:
+            radius = self.cell_size // 2
+
+        x, y = self.transform_coordinates(x, y)
+        surface = pygame.Surface((2*radius, 2*radius), pygame.SRCALPHA)
+        pygame.draw.circle(surface, color, (radius, radius), radius)
+        self.screen.blit(surface, (x - radius, y - radius))
     
     def draw_text(self, text = "Hello, Pygame!", coord = None, size = None):
         if coord == None:
@@ -114,32 +126,31 @@ class Renderer():
                 pygame.draw.line(self.screen, color_axis, self.transform_coordinates(- axis_height, y), self.transform_coordinates(axis_height, y))
                 self.draw_text(str(y), (- axis_height * 2.0, y))
     
-    def draw_agent(self, x, y, color = (255, 0, 0), size = None, id = -1, text = 'mucho texto'):
-        if size is None:
-            size = self.cell_size // 2
-        x_transformed, y_transformed = self.transform_coordinates(x, y)
+    def draw_agent(self, x, y, color = (255, 0, 0), radius = None, id = -1, text = 'mucho texto', sightRadius = None):
         BLACK = (0, 0, 0)
-        pygame.draw.circle(self.screen, BLACK, (x_transformed, y_transformed), size + 2)    # margen
-        pygame.draw.circle(self.screen, color, (x_transformed, y_transformed), size)
+
+        if radius is None:
+            radius = self.cell_size * self.radius
+        else:
+            radius = self.cell_size * radius
+
+        if sightRadius is None:
+            sightRadius = self.cell_size * self.sightRadius
+        
+        x_transformed, y_transformed = self.transform_coordinates(x, y)
+
+        circle_surface = pygame.Surface((100, 100), pygame.SRCALPHA)
+
+        self.draw_transparent_circle(x, y, radius=sightRadius, color=(255, 255, 255, 128))
+        pygame.draw.circle(self.screen, BLACK, (x_transformed, y_transformed), radius + 1)    # margen
+        pygame.draw.circle(self.screen, color, (x_transformed, y_transformed), radius)
         self.draw_text(f'{text}: {id}', (x, y), size=self.cell_size // 2)
     
-    # def draw_agent2(self, x, y, color = (255, 0, 0), size = None, id = -1):
-    #     if size is None:
-    #         size = self.cell_size // 2
-    #     point = Point(x, y)
-    #     BLACK = (0, 0, 0)
-    #     pygame.draw.circle(self.screen, BLACK, (point.x, point.y), size + 2)
-    #     pygame.draw.circle(self.screen, color, (point.x, point.y), size)
-    #     self.draw_text(f'{id}', (x, y), size=self.cell_size // 2)
-
     def update_display(self):
         pygame.display.flip()
     
     def draw_agents(self, agents):
-        # Aquí puedes agregar el código para dibujar los agentes
-        for agent in agents:
-            x, y = agent['position']
-            pygame.draw.circle(self.screen, (255, 0, 0), (x, y), 5)
+        pass
 
     def draw_obstacles(self):
         height = len(self.map)
@@ -151,8 +162,8 @@ class Renderer():
                     self.draw_obstacle(x, y_inverted)
                     pass
 
-    def draw_obstacle(self, x, y, color = (255, 0, 0)):
-        # Usa como referencia el punto inferior izquierdo de la celda
+    def draw_obstacle(self, x, y, color = (255, 0, 0)):     # Usa como referencia el punto inferior izquierdo de la celda
+        
         y += 1
         x, y = self.transform_coordinates(x, y)
 
@@ -165,14 +176,6 @@ class Renderer():
 
         pygame.draw.rect(self.screen, color, (x, y, self.cell_size, self.cell_size))
 
-    def draw_map(self, map_data):
-        # Aquí puedes agregar el código para dibujar el mapa
-        # Por ejemplo, recorrer el mapa y dibujar cada celda
-        for y, row in enumerate(map_data):
-            for x, cell in enumerate(row):
-                if cell == '1':
-                    pass
-    
     def start(self):
         running = True
         while running:
@@ -180,16 +183,12 @@ class Renderer():
                 if event.type == pygame.QUIT:
                     running = False
 
-            # Aquí puedes agregar el código para dibujar el mapa y los agentes
-            self.draw_background((135, 206, 250))
+            self.draw_background((135, 206, 250)) 
             self.draw_obstacles()
-            # self.draw_agents()
             self.draw_grid()
-            self.draw_agent(0,0, color=(175, 0, 0), text='A')
-            self.draw_agent(1, 10, color=(175, 0, 0))
-            # self.draw_obstacle2()
-            # self.draw_obstacle(1, 1)
+            self.draw_agent(2.5,3.5, color=(175, 0, 0), text='ID', radius= 0.5)
             self.update_display()
+            
 
         # self.quit()
     

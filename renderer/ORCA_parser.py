@@ -27,15 +27,20 @@ def process_input_config(renderer):
     for i, line in enumerate(sys.stdin):
         line = line.strip()
         if state == "map":
-            if i < height:
-                row = line.split()
-                map.append(row)
-            else:
+            row = line.split()
+            map.append(row)
+            if i >= height - 1:
                 state = "param"
                 continue
+            # if i < height:
+            #     row = line.split()
+            #     map.append(row)
+            # else:
+            #     state = "param"
+            #     continue
 
         if state == "param":
-            if i < 7 + height:
+            if i < height + 7:
                 clave, valor = line.split(":", 1)
                 agents_default_param[clave.strip()] = valor.strip()
             else:
@@ -64,7 +69,9 @@ def process_input_config(renderer):
     
     title = f"Simulator ORCA - {agents_default_param['NumAgents']} agents"
     renderer.set_title(title)
-    renderer.set_agent_default_param(agents_default_param)
+    renderer.sightRadius = float(agents_default_param.get('sightRadius', -1))
+    renderer.radius = float(agents_default_param.get('radius', -1))
+    # renderer.set_agent_default_param(agents_default_param)
     renderer.set_agents_init_pos(agents_init_pos)
     renderer.set_map(map)
 
@@ -73,12 +80,12 @@ if __name__ == "__main__":
 
     #TO DO: GET WORLD NAME
     pygame.init()
-    renderer = Renderer(800, 600, cell_size=25)
+    renderer = Renderer(800, 600, cell_size=50)
     # renderer.set_title("Simulator ORCA")
     # renderer.start()
     process_input_config(renderer)
     
-    # renderer.start()
+    renderer.start()
 
     for item, value in renderer.get_agents_default_param().items():
         print(f"{item} {value}")
@@ -86,13 +93,6 @@ if __name__ == "__main__":
     for agent in renderer.get_agents_init_pos():
         print(f"Agent {agent['id']} \t {agent['start'][0]} {agent['start'][1]} \t {agent['goal'][0]} {agent['goal'][1]}")
 
-    for x, row in enumerate(renderer.get_map()):
-        for y, cell in enumerate(row):
-            if cell == '1':
-                renderer.draw_obstacle(x, y)
-            # print(f'{x, y}', end=" ")
-        # print()
-    
     # while True:
     #     for i in range(agents_default_param['NumAgents']):
     #         line = sys.stdin.readline().strip()
@@ -102,6 +102,19 @@ if __name__ == "__main__":
     #     line = sys.stdin.readline().strip()
     #     if not line:
     #         break
+
+    while True:
+        for agent in renderer.get_agents_init_pos():
+            line = sys.stdin.readline().strip()
+            posX, posY = line.split(" ")
+            print(f"Agent {agent['id']} \t {posX} {posY}")
+
+        line = sys.stdin.readline().strip()
+        if not line:
+            break
+
+    pygame.quit()
+    sys.exit(0)
         
         
 
