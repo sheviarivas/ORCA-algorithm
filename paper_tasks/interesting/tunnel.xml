@@ -1,12 +1,13 @@
 <?xml version='1.0' encoding='utf-8'?>
 <root>
-    <agents number="10" type="orca-par">
-	    <default_parameters size="0.3" movespeed="0.4" agentsmaxnum="10" timeboundary="5.4" sightradius="3.0" timeboundaryobst="33"/>
-        <agent id="0" start.xr="1.5" start.yr="1.5" goal.xr="5.5" goal.yr="1.5"/>
-        <agent id="1" start.xr="1.5" start.yr="2.5" goal.xr="5.5" goal.yr="2.5"/>
-        <agent id="2" start.xr="5.5" start.yr="1.5" goal.xr="1.5" goal.yr="1.5"/>
-        <!-- <agent id="3" start.xr="" start.yr="" goal.xr="" goal.yr=""/> -->
-        <!-- <agent id="3" start.xr="" start.yr="" goal.xr="" goal.yr=""/> -->
+    <agents number="10" type="orca">
+	    <!-- <default_parameters sightradius="0" agentsmaxnum="10" timeboundary="5" timeboundaryobst="33" size="0.35" movespeed="0.3"/> -->
+        <default_parameters sightradius="2" agentsmaxnum="10" timeboundary="5" timeboundaryobst="33" size="0.1" movespeed="0.2"/>
+        <!-- cuidadito que cuando hay un agente en ua posición inválida el simrendererV3 muere -->
+        <agent id="0" start.xr="1.5" start.yr="1.5" goal.xr="1.5" goal.yr="1.5"/>
+        <agent id="1" start.xr="0.5" start.yr="1.5" goal.xr="1.5" goal.yr="1.5"/>
+        <agent id="2" start.xr="3.5" start.yr="2.5" goal.xr="5.5" goal.yr="2.5"/>
+        <agent id="3" start.xr="5.5" start.yr="2.5" goal.xr="1.5" goal.yr="2.5"/>
     </agents>
 
     <obstacles number="2" >
@@ -28,11 +29,10 @@
         <height>4</height>
         <cellsize>1</cellsize>
         <grid>
-            <!-- 3 --> <row>1 1 1 1 1 1 1</row>
-            <!-- 2 --> <row>1 0 0 0 0 0 1</row>
-            <!-- 1 --> <row>1 0 0 0 0 0 1</row>
-            <!-- 0 --> <row>1 1 1 1 1 1 1</row>
-                       <!-- 0 1 2 3 4 5 6 -->
+            <row>1 1 1 1 1 1 1</row>
+            <row>1 0 0 0 0 0 1</row>
+            <row>1 0 0 0 0 0 1</row>
+            <row>1 1 1 1 1 1 1</row>
     </grid>
     </map>
     <algorithm>
@@ -42,7 +42,8 @@
         <cutcorners>false</cutcorners>
         <hweight>1</hweight>
         <timestep>0.1</timestep>
-        <delta>0.1</delta>
+        <!-- dentro de RVO2, delta se encuentra en la función reachedGoal -->
+        <delta>0.1</delta>  
         <trigger>common-point</trigger>
         <mapfnum>3</mapfnum>
     </algorithm>
@@ -50,13 +51,38 @@
 
 <!-- 
 
-observación:
-puedo añadir observaciones al xml
-no hay problemas con caracteres de ningún tipo
-siempre y cuando esté el último tag como comentario, el archivo se puede leer sin problemas 
+    observaciones:
 
-puedo definir obstáculos a pesar de que estén fuera de los límites
+        los agentes implementados no parecen ser capaces de encontrar solución a este problema...
+        quizá cambiando ciertos parámetros se pueda
+        ojo a timeboundary="5" sightradius="0.0" timeboundaryobst="33"
 
+        agentes no se mueven si size>0.35. pretty weird if you ask me
+
+        agentes no tienen problema con sigutradius=0.0. Cualquier otro valor evita que agentes lleguen a meta
+
+        por qué no pasa nada con:????
+                <default_parameters size="0.3" movespeed="0.3" agentsmaxnum="10" timeboundary="5" sightradius="0.0" timeboundaryobst="33"/>
+                    parece que sightradius tiene algo que ver. Hace que los ag sean como intangibles
+
+
+        xd
+
+        - dentro de ComputeNewVelocity:
+            saber cuándo se detecta la colisión se desvía el agente considerando
+                otros agentes
+                obstáculos
+        
+        - entender prioridades sobre el movimiento y el desvío/ dirección del ag. 
+        - rango de avance concorde con la colisión
+
+        funciona con: 
+            <default_parameters sightradius="2" agentsmaxnum="10" timeboundary="5" timeboundaryobst="33" size="0.1" movespeed="0.2"/>
+        
+        
+        kotlin
+
+        
 -->
 
 <!--  -->
