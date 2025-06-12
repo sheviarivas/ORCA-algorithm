@@ -308,7 +308,7 @@ void agent_cnav::ApplyNewVelocity() {
 	currV = newV;
 }
 
-std::vector<int> agent_cnav::GetMostConstrainedNeighs() {
+bool agent_cnav::GetMostConstrainedNeighs(std::vector<int> &cRank) {
 	std::vector<int> C;
 	std::vector<float> D;
 	
@@ -326,44 +326,49 @@ std::vector<int> agent_cnav::GetMostConstrainedNeighs() {
  	std::sort(C.begin(), C.end(),
            [&](const float a, const float b) -> bool { return D[a] < D[b]; });
 
-	return C;
+	cRank = C;
+	return true;
 }
 
-int agent_cnav::SimMotion(std::vector<int> cRank){
-	// to do: entregar valores correctos de los parámetros k y T
-	int k = -1;
-	int T = -1;
-	float R_ca = -1;
-	float R_ga = -1;
+// int agent_cnav::SimMotion(Mission* simulateMission){
+// 	// to do: entregar valores correctos de los parámetros k y T
+// 	int k = -1;
+// 	int T = -1;
+// 	float R_ca = -1;
+// 	float R_ga = -1;
 
-	for (int t=0; t<T; ++t){
-		// to do: simulate neighs
-		// como debería considerar la simulación de los agentes?
-		// utilizando solo ORCA?
-		// obtener instancia de simulacion????
-		// de todas maneras necesito modificar las funciones para la recompensa
+// 	for (int t=0; t<T; ++t){
+// 		// simulate neighs
+// 		for (auto &neigh: Neighbours) {
+// 			neigh.second->UpdatePrefVelocity();	// obtener dirección de vector hacia meta
+// 		}
+
+// 		for (auto &neigh: Neighbours) {
+// 			neigh.second->ComputeNewVelocity();	// considerará otros ag., obstáculos, y celdas disponibles contra la dirección obtenida (?)		// acá me parece que termina de funcionar toda la lógica de orca
+// 		}
 		
-		if (t>0){
-			for(int j=0; j<k; ++j){
-				agent_cnav* neigh_j = dynamic_cast<agent_cnav*>(Neighbours[cRank[j]].second);
-				float maxV_j = neigh_j->maxSpeed;
-				float intentV_j = neigh_j->GetIntentVelocity().EuclideanNorm();
-				float newV_j = neigh_j->GetVelocity().EuclideanNorm();
+// 		if (t>0){
+// 			for(int j=0; j<k; ++j){
+// 				agent_cnav* neigh_j = dynamic_cast<agent_cnav*>(Neighbours[cRank[j]].second);
+// 				float maxV_j = neigh_j->maxSpeed;
+// 				float intentV_j = neigh_j->GetIntentVelocity().EuclideanNorm();
+// 				float newV_j = neigh_j->GetVelocity().EuclideanNorm();
 
-				R_ca = R_ca + maxV_j - abs( intentV_j - newV_j );
-			}
-		}
-		float newV_i = this->GetVelocity().EuclideanNorm();
+// 				R_ca = R_ca + maxV_j - abs( intentV_j - newV_j );
+// 			}
+// 		}
+// 		float newV_i = this->GetVelocity().EuclideanNorm();
 
 
-		R_ga = R_ga; // + currV_i * posActual - meta / magnitud
-	}
+// 		R_ga = R_ga; // + currV_i * posActual - meta / magnitud
+// 	}
 
-	R_ga;
-	R_ga;
+// 	R_ga;
+// 	R_ga;
+// 	delete(simulateMission);
 
-	return -1;
-}
+// 	return -1;
+// }
 
 bool agent_cnav::UpdatePrefVelocity() {
 	Point next;
@@ -372,6 +377,7 @@ bool agent_cnav::UpdatePrefVelocity() {
 		float dist = goalVector.EuclideanNorm();
 		if (next == goal && dist < options->delta) {
 			prefV = Point();
+			intentV = Point();
 			return true;
 		}
 
@@ -380,25 +386,14 @@ bool agent_cnav::UpdatePrefVelocity() {
 		}
 
 		prefV = goalVector;
+		intentV = goalVector;
 		nextForLog = next;
 		return true;
-
-		std::vector<int> cRank = agent_cnav::GetMostConstrainedNeighs();
-		int betaAngle = 45;
-
-		// To do: aplicar ángulo beta al vector
-		// for actions:
-
-		auto Ra = agent_cnav::SimMotion(cRank);
-
-
-		
-
 	}
 	nextForLog = Point();
 	prefV = Point();
+	intentV = Point();
 	return false;
-
 }
 
 agent_cnav &agent_cnav::operator=(const agent_cnav &obj) {
@@ -430,3 +425,21 @@ Point agent_cnav::GetIntentVelocity(){
 bool agent_cnav::UpdateIntentVelocity(){
 	// to do
 }
+
+std::vector<std::pair<float, Agent *>> agent_cnav::GetNeighbours(){
+	return Neighbours;
+}
+
+void agent_cnav::SetPrefVelocity(const Velocity &vel){
+	prefV = vel;
+}
+
+Velocity agent_cnav::GetPrefVelocity() const{
+	return prefV;
+}
+
+float agent_cnav::GetMaxSpeed() const{
+	return maxSpeed;
+}
+
+

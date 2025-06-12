@@ -75,6 +75,7 @@ class Agent {
 
 		Point GetNext() const;
 
+		Point GetGoal() const;
 
 		std::pair<unsigned int, unsigned int> GetCollision() const;
 

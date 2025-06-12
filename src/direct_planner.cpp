@@ -7,7 +7,7 @@ bool DirectPlanner::GetNext(const Point &curr, Point &next) {
 }
 
 bool DirectPlanner::CreateGlobalPath() {
-	// siempre true, va directo a la meta (creo que no le importan los obstáculos)
+	// siempre true, va directo a la meta (creo que no le importan los obstáculos) // ignora celdas untraversable (pasa por ellas de todas formas), but no puede atravesar líneas de obs. 
 	return true;
 }
 

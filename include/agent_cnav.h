@@ -1,4 +1,5 @@
 #include "agent.h"
+// #include "mission.h"
 
 #ifndef ORCA_ORCAAGENTWITHCNAV_H
 #define ORCA_ORCAAGENTWITHCNAV_H
@@ -32,13 +33,23 @@ class agent_cnav : public Agent {
 
 		agent_cnav &operator=(const agent_cnav &obj);
 
-		std::vector<int> GetMostConstrainedNeighs();
 
-		int SimMotion(std::vector<int> cRank);
+		bool GetMostConstrainedNeighs(std::vector<int> &cRank);
+
+		// int SimMotion(Mission* simulateMission);
 
 		bool UpdateIntentVelocity();
 
 		Point GetIntentVelocity();
+
+		std::vector<std::pair<float, Agent *>> GetNeighbours();
+
+		void SetPrefVelocity(const Velocity &vel);
+
+		Velocity GetPrefVelocity() const;
+
+		float GetMaxSpeed() const;
+
 
 
 	private:
@@ -47,6 +58,10 @@ class agent_cnav : public Agent {
 		Velocity intentV;
 
 		float maxSpeed;
+
+		
+
+		// std::vector<int> cRank;
 
 };
 

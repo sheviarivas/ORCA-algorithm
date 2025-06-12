@@ -224,6 +224,10 @@ Point Agent::GetNext() const {
 	return nextForLog;
 }
 
+Point Agent::GetGoal() const {
+	return goal;
+}
+
 
 bool Agent::CommonPointMAPFTrigger(float distToTargetPoint) {
 	return (Neighbours.size() >= options->MAPFNum) && (distToTargetPoint < param.sightRadius);	// qué pasa si mis agentes tan muy lejos de la meta y tan en deadlock?
