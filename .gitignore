@@ -16,3 +16,6 @@ README.html
 steps.yaml
 /otroBuild
 /build_renderer
+renderer/justABunchOfCode.py
+renderer/sobreescribir.py
+renderer/__pycache__
