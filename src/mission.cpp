@@ -117,6 +117,7 @@ Summary Mission::StartMission() {
 #endif
 	// creo que se usa para calcular cuanto tiempo toma la ejecución
 	auto startpnt = std::chrono::high_resolution_clock::now();
+	std::cout << "NumAgents: " << agents.size() << std::endl;
 	for (auto agent: agents) {
 #if MAPF_LOG
 		//was is das???? cmo es pal PARandECBS asi que nnuuuuo
@@ -126,10 +127,12 @@ Summary Mission::StartMission() {
 #endif
 		// std::cout<<"Nodos Theta Agente "<<agent->GetID()<<std::endl<<std::endl;	// marcado
 		bool found = agent->InitPath();
+		std:: cout << agent->GetID() << " " << agent->GetPosition().ToString() << " " << agent->GetGoal().ToString() << std::endl;
+
 #if FULL_OUTPUT
 		if (!found) {
 			
-			std::cout << agent->GetID() << " " << "Path not found\n";
+			std::cerr << agent->GetID() << " " << "Path not found\n";
 		}
 #endif
 		resultsLog.insert({agent->GetID(), {false, 0}});
@@ -291,12 +294,9 @@ bool Mission::SaveLog() {
 void Mission::UpdateSate() {
 	size_t i = 0;
 	allStops = true;
-	bool printYAML = false;
-	bool printPositions = false;
-	if (printPositions) ::cout<< "Step "<< stepsCount<< std::endl;
-	if (printYAML){
-		std::cout<< "    - ";
-	} 
+	bool print_positions = true;
+	if (print_positions) ::cout<< "Step "<< stepsCount<< std::endl;
+	
 	for (auto &agent: agents) {
 		agent->ApplyNewVelocity();	// actualiza currV y meanSavedSpeed. Otros parámetros quedan en false
 		Point newPos = agent->GetPosition() + (agent->GetVelocity() * options->timestep);
@@ -325,19 +325,11 @@ void Mission::UpdateSate() {
 		goalsLog[agent->GetID()].push_back(agent->GetNext());
 #endif
 		i++;
-		if (printPositions) std::cout << agent->GetPosition().ToString()<< std::endl;
-		if (printYAML){
-			if (agent->GetID()==0){
-				std::cout << "- " << agent->GetPosition().ToString()<< std::endl;
-			}
-			else{
-				std::cout << "      - " << agent->GetPosition().ToString()<< std::endl;
-			}
-			
-		} 
+		if (print_positions) std::cout << agent->GetPosition().ToString()<< std::endl;
+		
 		// std::cout<< "Posición Ag " << agent->GetID()<< ": " << agent->GetPosition().ToString()<< std::endl;
 	}
-	if (printPositions) std::cout<< std::endl;
+	// if (print_positions) std::cout<< std::endl;
 
 	stepsCount++;
 }
@@ -573,4 +565,8 @@ bool Mission::SimMotion(std::vector<std::vector<int>> &cRanks){
 	// delete(simulateTask);
 
 	return -1;
+}
+
+void Mission::UpdateSimulation(){
+	
 }

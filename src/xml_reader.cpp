@@ -319,6 +319,9 @@ bool XMLReader::ReadMap() {
 				return false;
 			}
 			element = mapnode->FirstChildElement();
+			// std::cout << "MAP INFO" << std::endl;
+			std::cout << "height: " << height << std::endl;
+
 			while (gridI < height) {	// contador de rows
 				if (!element) {
 					std::cout << "Error! Not enough '" << CNS_TAG_ROW << "' tags inside '" << CNS_TAG_GRID << "' tag."
@@ -329,6 +332,7 @@ bool XMLReader::ReadMap() {
 					return false;
 				}
 				std::string str = element->GetText();
+				std::cout << str << std::endl;	// aquí imprimo cada row del grid
 				std::vector<std::string> elems;
 				std::stringstream ss(str);
 				std::string item;
@@ -637,6 +641,15 @@ bool XMLReader::ReadAgents() {
 
 	int id;
 	float stx = 0, sty = 0, gx = 0, gy = 0, stt = CN_DEFAULT_START_THETA;
+
+	// Get the agent's parameters
+	std::cout << "sightRadius: " << defaultParam.sightRadius << std::endl;
+	std::cout << "timeBoundary: " << defaultParam.timeBoundary << std::endl;
+	std::cout << "timeBoundaryObst: " << defaultParam.timeBoundaryObst << std::endl;
+	std::cout << "radius: " << defaultParam.radius << std::endl;
+	std::cout << "rEps: " << defaultParam.rEps << std::endl;
+	std::cout << "maxSpeed: " << defaultParam.maxSpeed << std::endl;
+	std::cout << "agentsMaxNum: " << defaultParam.agentsMaxNum << std::endl;
 
 	/* Each individual agent */
 	for (count = 0; tmpElement; tmpElement = tmpElement->NextSiblingElement(CNS_TAG_AGENT), count++) {

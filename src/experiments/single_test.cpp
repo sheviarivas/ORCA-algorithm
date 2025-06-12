@@ -39,12 +39,6 @@ int main(int argc, char *argv[]) {
 	// se lee el .xml y se inicializan variables
 	if (task.ReadTask()) {
 		
-		bool printYAML = false;
-
-		if (printYAML){
-			std::cout<< "simulation:"<< std::endl;
-			std::cout<< "  steps:"<< std::endl;
-		}
 		auto summary = task.StartMission();
 		
 		auto full_summary = summary.getFullSummary();
@@ -53,8 +47,10 @@ int main(int argc, char *argv[]) {
 			keys.push_back(it->first);
 			values.push_back(it->second);
 		}
+		
+		bool print_summary = false;
 
-		if (!printYAML){
+		if (print_summary){
 			for (auto &key : keys) {
 				std::cout << std::right << std::setfill(' ') << std::setw(15) << key  << ' ';
 			}
