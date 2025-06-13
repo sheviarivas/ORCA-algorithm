@@ -1,0 +1,88 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root>
+    <agents number="10" type="orca">
+	    <!-- <default_parameters sightradius="0" agentsmaxnum="10" timeboundary="5" timeboundaryobst="33" size="0.35" movespeed="0.3"/> -->
+        <default_parameters sightradius="2" agentsmaxnum="10" timeboundary="5" timeboundaryobst="33" size="0.1" movespeed="0.2"/>
+        <!-- cuidadito que cuando hay un agente en ua posición inválida el simrendererV3 muere -->
+        <agent id="0" start.xr="1.5" start.yr="1.5" goal.xr="1.5" goal.yr="1.5"/>
+        <agent id="1" start.xr="0.5" start.yr="1.5" goal.xr="1.5" goal.yr="1.5"/>
+        <agent id="2" start.xr="3.5" start.yr="2.5" goal.xr="5.5" goal.yr="2.5"/>
+        <agent id="3" start.xr="5.5" start.yr="2.5" goal.xr="1.5" goal.yr="2.5"/>
+    </agents>
+
+    <obstacles number="2" >
+        <obstacle>
+            <vertex xr="0" yr="0"/>
+            <vertex xr="7" yr="0"/>
+            <vertex xr="7" yr="4"/>
+            <vertex xr="0" yr="4"/>
+        </obstacle>
+        <obstacle>
+            <vertex xr="1" yr="1"/>
+            <vertex xr="6" yr="1"/>
+            <vertex xr="6" yr="3"/>
+            <vertex xr="1" yr="3"/>
+        </obstacle>
+    </obstacles>
+    <map>
+        <width>7</width>
+        <height>4</height>
+        <cellsize>1</cellsize>
+        <grid>
+            <row>1 1 1 1 1 1 1</row>
+            <row>1 0 0 0 0 0 1</row>
+            <row>1 0 0 0 0 0 1</row>
+            <row>1 1 1 1 1 1 1</row>
+    </grid>
+    </map>
+    <algorithm>
+        <searchtype>thetastar</searchtype>
+        <breakingties>0</breakingties>
+        <allowsqueeze>false</allowsqueeze>
+        <cutcorners>false</cutcorners>
+        <hweight>1</hweight>
+        <timestep>0.1</timestep>
+        <!-- dentro de RVO2, delta se encuentra en la función reachedGoal -->
+        <delta>0.1</delta>  
+        <trigger>common-point</trigger>
+        <mapfnum>3</mapfnum>
+    </algorithm>
+</root>
+
+<!-- 
+
+    observaciones:
+
+        los agentes implementados no parecen ser capaces de encontrar solución a este problema...
+        quizá cambiando ciertos parámetros se pueda
+        ojo a timeboundary="5" sightradius="0.0" timeboundaryobst="33"
+
+        agentes no se mueven si size>0.35. pretty weird if you ask me
+
+        agentes no tienen problema con sigutradius=0.0. Cualquier otro valor evita que agentes lleguen a meta
+
+        por qué no pasa nada con:????
+                <default_parameters size="0.3" movespeed="0.3" agentsmaxnum="10" timeboundary="5" sightradius="0.0" timeboundaryobst="33"/>
+                    parece que sightradius tiene algo que ver. Hace que los ag sean como intangibles
+
+
+        xd
+
+        - dentro de ComputeNewVelocity:
+            saber cuándo se detecta la colisión se desvía el agente considerando
+                otros agentes
+                obstáculos
+        
+        - entender prioridades sobre el movimiento y el desvío/ dirección del ag. 
+        - rango de avance concorde con la colisión
+
+        funciona con: 
+            <default_parameters sightradius="2" agentsmaxnum="10" timeboundary="5" timeboundaryobst="33" size="0.1" movespeed="0.2"/>
+        
+        
+        kotlin
+
+        
+-->
+
+<!--  -->
