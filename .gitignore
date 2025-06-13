@@ -14,3 +14,8 @@ README.html
 /vanillaBuild
 /cnavBuild
 steps.yaml
+/build_renderer
+/otroBuild
+renderer/justABunchOfCode.py
+renderer/sobreescribir.py
+renderer/__pycache__
