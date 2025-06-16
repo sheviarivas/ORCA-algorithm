@@ -28,6 +28,18 @@ endif(MAPF_LOG_FLAG)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -w -O0" )
 add_subdirectory(external/tinyxml2)
 
+# OpenGL
+find_package(OpenGL REQUIRED)
+
+# GLUT (manualmente, ya que find_package(GLUT) falla)
+set(GLUT_INCLUDE_DIRS "/usr/include/GL")
+set(GLUT_LIBRARIES "-lglut")
+
+# Incluir headers externos
+include_directories(${OPENGL_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS})
+
+# Incluir headers del proyecto
+include_directories(${PROJECT_SOURCE_DIR}/include)
 
 
 SET(MA_NAV_LIB_SOURCES
@@ -67,10 +79,10 @@ target_include_directories(ma_navigation_lib
         PUBLIC
         ${PROJECT_SOURCE_DIR}/include
         )
-target_link_libraries(ma_navigation_lib tinyxml2)
+target_link_libraries(ma_navigation_lib tinyxml2 ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})
 add_executable(single_test src/experiments/single_test.cpp)
 add_executable(series_test src/experiments/series_test.cpp)
 
-target_link_libraries(single_test ma_navigation_lib tinyxml2)
+target_link_libraries(single_test ma_navigation_lib tinyxml2 ${GLUT_LIBRARIES})
 target_link_libraries(series_test ma_navigation_lib tinyxml2)
 

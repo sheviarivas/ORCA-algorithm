@@ -6,6 +6,8 @@
 
 #include "mission.h"
 
+#include "glut_renderer.h"
+
 #define STEP_MAX            1000
 #define IS_TIME_BOUNDED     false
 #define STOP_BY_SPEED       true
@@ -36,6 +38,12 @@ int main(int argc, char *argv[]) {
 
 	Mission task = Mission(taskfile, num, STEP_MAX, IS_TIME_BOUNDED, TIME_MAX, STOP_BY_SPEED);
 
+	
+	bool visualizer = true;
+	if (visualizer) {
+		glutInit(&argc, argv);
+	}
+	
 	// se lee el .xml y se inicializan variables
 	if (task.ReadTask()) {
 		

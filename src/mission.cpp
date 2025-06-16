@@ -1,5 +1,7 @@
 #include "mission.h"
 
+#include "glut_renderer.cpp"
+
 
 Mission::Mission(std::string fileName, unsigned int agentsNum, unsigned int stepsTh, bool time, size_t timeTh,
 				 bool speedStop) {
@@ -142,30 +144,41 @@ Summary Mission::StartMission() {
 
 	}
 
+	bool visualizer = true; // dejé otro en single_test
+	if (visualizer){
+		prepareRenderer();
+	}
 	
 
 	bool needToStop, needToStopByTime, needToStopBySteps, needToStopBySpeed;
 	do {
-		AssignNeighbours();	// actualiza vecinos (ag. y obs.) añadiendo nuevos o quitando aquellos que se alejaron en el camino
+		
 
-		for (auto &agent: agents) {
-			agent->UpdatePrefVelocity();	// obtener dirección de vector hacia meta
-		}
+		UpdateLogic(needToStop, needToStopByTime, needToStopBySteps, needToStopBySpeed, startpnt);
 
-		for (auto &agent: agents) {
-			agent->ComputeNewVelocity();	// considerará otros ag., obstáculos, y celdas disponibles contra la dirección obtenida (?) 
-		}
+		// AssignNeighbours();	// actualiza vecinos (ag. y obs.) añadiendo nuevos o quitando aquellos que se alejaron en el camino
 
-		UpdateSate();
-		auto checkpnt = std::chrono::high_resolution_clock::now();
-		size_t nowtime = std::chrono::duration_cast<std::chrono::milliseconds>(checkpnt - startpnt).count();
+		// for (auto &agent: agents) {
+		// 	agent->UpdatePrefVelocity();	// obtener dirección de vector hacia meta
+		// }
 
-		needToStopBySpeed = (stopByMeanSpeed and allStops);
-		needToStopByTime = (isTimeBounded and nowtime >= timeTreshhold);
-		needToStopBySteps = (!isTimeBounded and stepsCount >= stepsTreshhold);
-		needToStop = needToStopBySpeed or needToStopByTime or needToStopBySteps;
+		// for (auto &agent: agents) {
+		// 	agent->ComputeNewVelocity();	// considerará otros ag., obstáculos, y celdas disponibles contra la dirección obtenida (?) 
+		// }
+
+		// UpdateSate();
+		// auto checkpnt = std::chrono::high_resolution_clock::now();
+		// size_t nowtime = std::chrono::duration_cast<std::chrono::milliseconds>(checkpnt - startpnt).count();
+
+		// needToStopBySpeed = (stopByMeanSpeed and allStops);
+		// needToStopByTime = (isTimeBounded and nowtime >= timeTreshhold);
+		// needToStopBySteps = (!isTimeBounded and stepsCount >= stepsTreshhold);
+		// needToStop = needToStopBySpeed or needToStopByTime or needToStopBySteps;
 
 	} while (!IsFinished() && !needToStop);
+
+	glutMainLoop();
+
 
 	auto endpnt = std::chrono::high_resolution_clock::now();
 	size_t res = std::chrono::duration_cast<std::chrono::milliseconds>(endpnt - startpnt).count();
@@ -392,4 +405,39 @@ Mission &Mission::operator=(const Mission &obj) {
 		stopByMeanSpeed = obj.stopByMeanSpeed;
 	}
 	return *this;
+}
+
+void Mission::UpdateLogic(bool &needToStopBySpeed, bool &needToStopByTime, bool &needToStopBySteps, bool &needToStop, auto &startpnt){
+	AssignNeighbours();	// actualiza vecinos (ag. y obs.) añadiendo nuevos o quitando aquellos que se alejaron en el camino
+
+	for (auto &agent: agents) {
+		agent->UpdatePrefVelocity();	// obtener dirección de vector hacia meta
+	}
+
+	for (auto &agent: agents) {
+		agent->ComputeNewVelocity();	// considerará otros ag., obstáculos, y celdas disponibles contra la dirección obtenida (?) 
+	}
+
+	UpdateSate();
+	auto checkpnt = std::chrono::high_resolution_clock::now();
+	size_t nowtime = std::chrono::duration_cast<std::chrono::milliseconds>(checkpnt - startpnt).count();
+
+	needToStopBySpeed = (stopByMeanSpeed and allStops);
+	needToStopByTime = (isTimeBounded and nowtime >= timeTreshhold);
+	needToStopBySteps = (!isTimeBounded and stepsCount >= stepsTreshhold);
+	needToStop = needToStopBySpeed or needToStopByTime or needToStopBySteps;
+
+}
+
+void updateLogic() {
+    step += 1;
+    if (step>= limitStep){
+        glutLeaveMainLoop();
+    }
+    // Actualiza la posición del círculo
+    ballX += ballSpeed;
+
+    if (ballX > 10.0f || ballX < 2.0f) {
+        ballSpeed = -ballSpeed;  // rebote simple
+    }
 }

@@ -34,6 +34,8 @@ class Mission {
 
 		Mission &operator=(const Mission &obj);
 
+		void UpdateLogic(bool &needToStopBySpeed, bool &needToStopByTime, bool &needToStopBySteps, bool &needToStop, auto &startpnt);
+
 #if FULL_LOG
 
 		bool SaveLog();
